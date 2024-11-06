@@ -23,3 +23,19 @@ Set up your env variables.
 ```bash
 bash start.sh
 ```
+
+## Deploy
+
+Before deploy apps, you need `az login`
+
+### Deploy Test App
+
+```bash
+bash deploy_test.sh
+```
+
+### Deploy API
+
+```bash
+bash deploy_api.sh
+```
