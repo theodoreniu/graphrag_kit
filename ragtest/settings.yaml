@@ -34,11 +34,11 @@ embeddings:
   ## parallelization: override the global parallelization settings for embeddings
   async_mode: threaded # or asyncio
   llm:
-    api_key: ${AZURE_API_KEY}
+    api_key: ${AZURE_EMBEDDING_API_KEY}
     type: azure_openai_embedding # or azure_openai_embedding / openai_embedding
     model: ${AZURE_EMBEDDING_MODEL_ID}
-    api_base: ${AZURE_API_BASE}
-    api_version: ${AZURE_API_VERSION}
+    api_base: ${AZURE_EMBEDDING_API_BASE}
+    api_version: ${AZURE_EMBEDDING_API_VERSION}
     deployment_name: ${AZURE_EMBEDDING_DEPLOYMENT_NAME}
 
     # api_base: https://<instance>.openai.azure.com

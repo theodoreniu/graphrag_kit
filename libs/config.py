@@ -21,6 +21,9 @@ azure_api_version = os.getenv('AZURE_API_VERSION', '')
 azure_chat_model_id = os.getenv('AZURE_CHAT_MODEL_ID', 'gpt-4o-mini')
 azure_chat_deployment_name = os.getenv('AZURE_CHAT_DEPLOYMENT_NAME', 'gpt-4o-mini')
 
+azure_embedding_api_key = os.getenv('AZURE_EMBEDDING_API_KEY', '')
+azure_embedding_api_base = os.getenv('AZURE_EMBEDDING_API_BASE', '')
+azure_embedding_api_version = os.getenv('AZURE_EMBEDDING_API_VERSION', '')
 azure_embedding_model_id = os.getenv('AZURE_EMBEDDING_MODEL_ID', 'text-embedding-3-small')
 azure_embedding_deployment_name = os.getenv('AZURE_EMBEDDING_DEPLOYMENT_NAME', 'text-embedding-3-small')
 
