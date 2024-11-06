@@ -24,7 +24,7 @@ Set up your env variables.
 bash start.sh
 ```
 
-When app was started, you will get 3 URLs:
+When the App(s) is started, you will get 3 URLs:
 
 - Manage App: http://localhost:9000/
 - Test App: http://localhost:9001/
