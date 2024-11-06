@@ -10,7 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 import libs.config as config
 import os
 
-app = FastAPI()
+app = FastAPI(   
+    title=f"Gragraph Kit API for {config.tenant_name}",  
+    version=config.app_version,             
+    terms_of_service="https://github.com/TheodoreNiu/graphrag_kit", 
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT",
+    },)
 
 app.add_middleware(
     CORSMiddleware,
