@@ -53,10 +53,13 @@ LANCE = 'lance'
 AI_SEARCH = 'Azure AI Search'
 
 def store_vector(rag_version: str):
-    if not config.disable_pgvector and st.button(f'Store data on {PG}', key=f"store_vector_pg_{rag_version}"):
-            store_vector_pgvector(rag_version=rag_version, db=PG) 
+
     if not config.disable_aisearch and st.button(f'Store data on {AI_SEARCH}', key=f"store_vector_aisearch_{rag_version}"):
             store_vector_pgvector(rag_version=rag_version, db=AI_SEARCH) 
+
+    if not config.disable_pgvector and st.button(f'Store data on {PG}', key=f"store_vector_pg_{rag_version}"):
+            store_vector_pgvector(rag_version=rag_version, db=PG) 
+            
     # if st.button('Store LanceDB', key=f"store_vector_lance_{rag_version}"):
     #         store_vector_pgvector(rag_version=rag_version, db=LANCE) 
     # if st.button('Store Milvus', key=f"store_vector_milvus_{rag_version}"):
