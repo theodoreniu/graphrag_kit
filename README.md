@@ -24,6 +24,13 @@ Set up your env variables.
 bash start.sh
 ```
 
+When the App(s) is started, you will get 3 URLs:
+
+- Manage App: http://localhost:9000/
+- Test App: http://localhost:9001/
+- API App: http://localhost:9002/docs
+
+
 ## Deploy
 
 Before deploy apps, you need `az login`

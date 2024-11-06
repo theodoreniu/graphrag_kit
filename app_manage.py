@@ -114,8 +114,9 @@ def versions_manage():
 
 def page(title: str):
     st.title(title)
-    st.write(f"GraphRAG Kit ({config.app_version})")
-    st.write(os.getenv('TEST_TIP'))
+    st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}`")
+    if config.manage_tip:
+        st.write(config.manage_tip)
     st.info(f"RAG tanant name: {config.tenant_name}")
 
     st.markdown("----------------------------")

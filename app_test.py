@@ -143,9 +143,9 @@ async def search(rag_version: str, db:str):
 
 def page(title: str):
     st.title(title)
-    st.write(f"GraphRAG Kit ({config.app_version})")
-    st.write(os.getenv('MANAGE_TIP'))
-    
+    st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}`")
+    if config.test_tip:
+        st.write(config.test_tip)
     rag_versions_list = get_rag_versions()
     if len(rag_versions_list) == 0:
         st.error("No RAG versions found.")
