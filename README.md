@@ -10,13 +10,13 @@
 
 ## Set Env
 
-Copy and set your `env`
+Copy and set your environment variables:
 
 ```bash
 cp .env.example .env
 ```
 
-Set up your env variables.
+Configure the environment variables in the .env file.
 
 ## Start App
 
@@ -24,16 +24,19 @@ Set up your env variables.
 bash start.sh
 ```
 
-When the App(s) is started, you will get 3 URLs:
+When the applications are started, you will have access to 3 URLs:
 
-- Manage App: http://localhost:9000/
+- Management App: http://localhost:9000/
 - Test App: http://localhost:9001/
-- API App: http://localhost:9002/docs
-
+- API Documentation: http://localhost:9002/docs
 
 ## Deploy
 
-Before deploy apps, you need `az login`
+Before deploying the applications, run:
+
+```bash
+az login
+```
 
 ### Deploy Test App
 
