@@ -1,0 +1,9 @@
+index/*
+!index/.gitkeep
+__pycache__/
+.venv
+.vscode
+.env
+cache/*
+data/*
+pdf_cache/*

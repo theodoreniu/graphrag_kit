@@ -1,0 +1,10 @@
+.git
+/node_modules/
+/.venv/
+/__pycache__/
+/.vscode/
+/.idea/
+/.gitignore
+.log
+cache
+pdf_cache
