@@ -1,4 +1,4 @@
-from graphrag_kit.libs.common import set_venvs
+from libs.common import set_venvs
 from libs.global_search import run_global_search
 from libs.local_search import run_local_search
 from libs.set_prompt import improve_query
