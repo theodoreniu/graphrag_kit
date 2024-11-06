@@ -107,9 +107,9 @@ async def run_local_search(
 
     text_embedder = OpenAIEmbedding(
         api_type=OpenaiApiType.AzureOpenAI,
-        api_key=config.azure_api_key,
-        api_base=config.azure_api_base,
-        api_version=config.azure_api_version,
+        api_key=config.azure_embedding_api_key,
+        api_base=config.azure_embedding_api_base,
+        api_version=config.azure_embedding_api_version,
         deployment_name=config.azure_embedding_deployment_name,
         model=config.azure_embedding_model_id,
         max_retries=20,
