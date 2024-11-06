@@ -27,8 +27,8 @@ azure_embedding_deployment_name = os.getenv('AZURE_EMBEDDING_DEPLOYMENT_NAME', '
 ai_search_url = os.getenv('AI_SEARCH_URL', '')
 ai_search_key = os.getenv('AI_SEARCH_KEY', '')
 
-di_url = os.getenv('DI_URL', '')
-di_key = os.getenv('DI_KEY', '')
+di_url = os.getenv('DOCUMENT_INTELLIGENCE_URL', '')
+di_key = os.getenv('DOCUMENT_INTELLIGENCE_KEY', '')
 
 disable_pgvector = os.getenv('DISABLE_PGVECTOR', False)
 disable_aisearch = os.getenv('DISABLE_AI_SAERCH', False)
