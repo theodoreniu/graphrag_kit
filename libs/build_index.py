@@ -52,16 +52,18 @@ def build_index(rag_version: str):
     base_path = f"/app/index/{config.tenant_name}/{rag_version}"
     if st.button('Start Build', key=f"build_index_{rag_version}"):
         with st.chat_message("user", avatar="avatars/ms.svg"):
-            if not os.path.exists(base_path):
-                st.error("Please upload a file first")
-                return
+            
+            # if not os.path.exists(base_path):
+            #     st.error("Please upload a file first")
+            #     return
 
-            if os.path.exists(f"{base_path}/output") and len(list_subdirectories(path=f"{base_path}/output")) > 0:
-                st.error("You have already built the index")
-                return
-            else:
-                with st.spinner(f'Running the index pipeline for {rag_version} ...'):
-                    run_command(f"python -m graphrag.index --verbose --root {base_path}")
+            # if os.path.exists(f"{base_path}/output") and len(list_subdirectories(path=f"{base_path}/output")) > 0:
+            #     st.error("You have already built the index")
+            #     return
+            # else:
+
+            with st.spinner(f'Running the index pipeline for {rag_version} ...'):
+                run_command(f"python -m graphrag.index --verbose --root {base_path}")
 
             subdirectories = list_subdirectories(path=f"{base_path}/output")
             if len(subdirectories) == 0:
