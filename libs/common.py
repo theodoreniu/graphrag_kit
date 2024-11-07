@@ -39,8 +39,9 @@ def debug(data:any, title:str=""):
         st.warning(data)
 
 def format_rag_version(version: str):
-    new_version = re.sub('[^a-zA-Z0-9]', '', version)
-    return new_version.lower()
+    if not re.match("^[A-Za-z0-9]*$", version):
+        raise ValueError("输入版本只能包含英文字母和数字，不允许其他符号。")
+    return version.lower()
 
 def delete_rag_version(version: str):
     run_command(f"rm -rf /app/index/{config.tenant_name}/{version}")
