@@ -106,7 +106,7 @@ async def search(rag_version: str, db:str):
                 with st.expander("Debug context_data"):
                     st.write(result.context_data)
                 with st.expander("Debug context_text"):
-                    st.write(result.context_text)
+                    st.text(result.context_text)
 
     if st.button('Global Search', key="global_search"):
         if not query:
@@ -123,12 +123,12 @@ async def search(rag_version: str, db:str):
             )
             st.success(result.response)
             st.write(f"LLM calls: {result.llm_calls}. LLM tokens: {result.prompt_tokens}")
-            
+
             if config.is_debug:
                 with st.expander("Debug context_data"):
                     st.write(result.context_data)
                 with st.expander("Debug context_text"):
-                    st.write(result.context_text)
+                    st.text(result.context_text)
 
     if st.button('Candidate Questions', key="run_candidate_questions"):
         if not query:
