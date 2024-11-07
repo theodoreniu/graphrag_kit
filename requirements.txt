@@ -24,3 +24,5 @@ streamlit-authenticator==0.4.1
 azure-ai-documentintelligence==1.0.0b4
 theodoretools==0.0.8
 azure-ai-formrecognizer==3.3.3
+streamlit_code_editor==0.1.21
+streamlit-ace==0.1.1
