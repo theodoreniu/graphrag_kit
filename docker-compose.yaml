@@ -19,6 +19,7 @@ services:
     volumes:
       - ./:/app
       - ./data:/data
+      - ./libs/create_graphrag_config.py:/usr/local/lib/python3.12/site-packages/graphrag/config/create_graphrag_config.py
     ports:
       - "9000:9000"
     networks:
@@ -42,6 +43,7 @@ services:
     volumes:
       - ./:/app
       - ./data:/data
+      - ./libs/create_graphrag_config.py:/usr/local/lib/python3.12/site-packages/graphrag/config/create_graphrag_config.py
     ports:
       - "9001:9001"
     networks:
@@ -54,6 +56,7 @@ services:
     command: fastapi dev app_api.py --host 0.0.0.0 --port 9002
     volumes:
       - ./:/app
+      - ./libs/create_graphrag_config.py:/usr/local/lib/python3.12/site-packages/graphrag/config/create_graphrag_config.py
     working_dir: /app
     ports:
       - "9002:9002"

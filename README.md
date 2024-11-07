@@ -30,6 +30,14 @@ When the applications are started, you will have access to 3 URLs:
 - Test App: http://localhost:9001/
 - API Documentation: http://localhost:9002/docs
 
+## Make App as your Service
+
+If you want to make the app as your service, run:
+
+```bash
+bash service.sh
+```
+
 ## Deploy
 
 Before deploying the applications, run:
