@@ -13,6 +13,8 @@ import os
 import re
 import base64
 from dotenv import load_dotenv
+from libs.save_env import set_envs
+from libs.save_settings import set_settings
 from langchain_community.chat_models import ChatOpenAI
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from streamlit_javascript import st_javascript
@@ -81,31 +83,34 @@ def versions_manage():
         show_expander = st.session_state.get(f"show_expander_{rag_version}", True)
         if show_expander:
             with st.expander(f"#### {rag_version} {size_mb}"):
-                tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+                tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
                     "1-Upload Files", 
                     "2-Generate Data", 
-                    "3-Build GraphRAG", 
-                    "4-Index Preview", 
-                    "5-Store Vectors", 
-                    "6-Prompt Tuning", 
-                    "7-Set Prompt", 
-                    "8-Delete"
+                    "3-GraphRAG Settings", 
+                    "4-Build GraphRAG", 
+                    "5-Index Preview", 
+                    "6-Store Vectors", 
+                    "7-Prompt Tuning", 
+                    "8-Set Prompt", 
+                    "9-Delete"
                     ])
                 with tab1:
                     upload_file(rag_version)
                 with tab2:
                     genearate_data(rag_version)
                 with tab3:
-                    build_index(rag_version)
+                    set_settings(rag_version)
                 with tab4:
-                    index_preview(rag_version)
+                    build_index(rag_version)
                 with tab5:
-                    store_vector(rag_version)
+                    index_preview(rag_version)
                 with tab6:
-                    prompt_tuning(rag_version)
+                    store_vector(rag_version)
                 with tab7:
-                    set_prompt(rag_version)
+                    prompt_tuning(rag_version)
                 with tab8:
+                    set_prompt(rag_version)
+                with tab9:
                     if st.button("Delete", key=f"delete_{rag_version}"):
                         delete_rag_version(rag_version)
                         show_expander = False
@@ -119,13 +124,15 @@ def page(title: str):
         st.write(config.manage_tip)
     st.info(f"RAG tanant name: {config.tenant_name}")
 
+    set_envs()
+
     st.markdown("----------------------------")
     st.markdown("# Build New Version")
     today_hour=time.strftime("%Y%m%d%H", time.localtime())
 
     new_rag_version=st.text_input("Please input new rag version", 
                                     value=today_hour,
-                                    max_chars=14,
+                                    max_chars=30,
                                     )
     btn = st.button("Confirm", key="confirm")
     if btn:
