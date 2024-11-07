@@ -58,8 +58,6 @@ def get_rag_versions():
     return versions
 
 def is_login(password: str):
-    if config.is_debug:
-        return True
     if 'password' not in st.session_state:
         return False
     if st.session_state.password != password:
