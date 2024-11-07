@@ -28,11 +28,11 @@ async def run_global_search(
     # LLM setup
     llm = ChatOpenAI(
         api_type=OpenaiApiType.AzureOpenAI,
-        api_key=config.azure_api_key,
-        deployment_name=config.azure_chat_deployment_name,
-        model=config.azure_chat_model_id,
-        api_base=config.azure_api_base,
-        api_version=config.azure_api_version,
+        api_key=config.search_azure_api_key,
+        deployment_name=config.search_azure_chat_deployment_name,
+        model=config.search_azure_chat_model_id,
+        api_base=config.search_azure_api_base,
+        api_version=config.search_azure_api_version,
         max_retries=20,
     )
 
