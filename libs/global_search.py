@@ -114,7 +114,7 @@ async def run_global_search(
     print(result.response)
 
     # inspect the data used to build the context for the LLM responses
-    result.context_data["reports"]
+    # result.context_data["reports"]
 
     # inspect number of LLM calls and tokens
     print(f"LLM calls: {result.llm_calls}. LLM tokens: {result.prompt_tokens}")

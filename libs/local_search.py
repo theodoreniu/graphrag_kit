@@ -183,10 +183,10 @@ async def run_local_search(
     print(result.response)
 
     # Inspecting the context data used to generate the response
-    result.context_data["entities"].head()
-    result.context_data["relationships"].head()
-    result.context_data["reports"].head()
-    result.context_data["sources"].head()
+    # result.context_data["entities"].head()
+    # result.context_data["relationships"].head()
+    # result.context_data["reports"].head()
+    # result.context_data["sources"].head()
     if "claims" in result.context_data:
         print(result.context_data["claims"].head())
     
