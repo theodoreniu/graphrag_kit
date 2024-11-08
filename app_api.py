@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse, RedirectResponse
 from libs.common import set_venvs
 from libs.global_search import run_global_search
 from libs.local_search import run_local_search
@@ -6,12 +7,14 @@ from libs.store_vector import PG
 from openai import AzureOpenAI
 from fastapi import FastAPI, Request,Header, HTTPException
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import libs.config as config
 import os
 
+
 app = FastAPI(   
-    title=f"Gragraph Kit API for {config.tenant_name}",  
+    title=f"Gragraph Kit API for {config.app_title}",  
     version=config.app_version,             
     terms_of_service="https://github.com/TheodoreNiu/graphrag_kit", 
     license_info={
@@ -31,6 +34,11 @@ class Item(BaseModel):
     query: str
     rag_version: str
     db: str
+
+# -----------------------------------------------------------------
+@app.get("/favicon.ico")
+async def favicon():
+   return FileResponse(os.path.join("avatars", "favicon.ico"))
 
 # -----------------------------------------------------------------
 @app.post("/api/local_search")
