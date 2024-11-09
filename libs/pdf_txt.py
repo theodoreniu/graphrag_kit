@@ -28,7 +28,7 @@ class PageTask:
         self.rag_version = rag_version   
         self.pdf_vision_option = pdf_vision_option
         self.pdf_vision_option_foramt = pdf_vision_option.replace(" ", "")
-        self.base_name = f"/app/index/{config.tenant_name}/{rag_version}/pdf_cache"
+        self.base_name = f"/app/projects/{rag_version}/pdf_cache"
         self.img_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png"
         self.txt_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png.txt"
         self.ai_txt_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png.{self.pdf_vision_option_foramt}.txt"
@@ -73,7 +73,7 @@ class PageTask:
     
 def save_pdf_pages_as_images(pdf_path:str, rag_version:str, pdf_vision_option):
     pdf_ai_txt_path = f"{pdf_path}.txt"
-    base_dir = f"/app/index/{config.tenant_name}/{rag_version}/pdf_cache"
+    base_dir = f"/app/projects/{rag_version}/pdf_cache"
     os.makedirs(base_dir, exist_ok=True)
 
     doc = fitz.open(pdf_path)

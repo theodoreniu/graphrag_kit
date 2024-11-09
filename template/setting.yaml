@@ -1,19 +1,17 @@
-
 encoding_model: cl100k_base
 skip_workflows: []
 llm:
   api_key: ${AZURE_API_KEY}
-  type: azure_openai_chat  # or azure_openai_chat / openai_chat
+  type: azure_openai_chat # or openai_chat
   model: ${AZURE_CHAT_MODEL_ID}
   model_supports_json: true # recommended if this is available for your model.
+  # audience: "https://cognitiveservices.azure.com/.default"
   # max_tokens: 4000
   # request_timeout: 180.0
-
   api_base: ${AZURE_API_BASE}
   api_version: ${AZURE_API_VERSION}
-  deployment_name: ${AZURE_CHAT_DEPLOYMENT_NAME}
-
   # organization: <organization_id>
+  deployment_name: ${AZURE_CHAT_DEPLOYMENT_NAME}
   # tokens_per_minute: 150_000 # set a leaky bucket throttle
   # requests_per_minute: 10_000 # set a leaky bucket throttle
   # max_retries: 10
@@ -33,34 +31,43 @@ async_mode: threaded # or asyncio
 embeddings:
   ## parallelization: override the global parallelization settings for embeddings
   async_mode: threaded # or asyncio
+  # target: required # or all
+  # batch_size: 16 # the number of documents to send in a single request
+  # batch_max_tokens: 8191 # the maximum number of tokens to send in a single request
+  vector_store:
+    type: lancedb
+    db_uri: 'output/lancedb'
+    container_name: default # A prefix for the vector store to create embedding containers. Default: 'default'.
+    overwrite: true
+  # vector_store: # configuration for AI Search
+  #   type: azure_ai_search
+  #   url: ${AI_SEARCH_URL}
+  #   api_key: ${AI_SEARCH_KEY}
+  #   # if not set, will attempt to use managed identity. Expects the `Search Index Data Contributor` RBAC role in this case.
+  #   # audience: <optional> # if using managed identity, the audience to use for the token
+  #   overwrite: true # or false. Only applicable at index creation time
+  #   container_name: default # A prefix for the AzureAISearch to create indexes. Default: 'default'.
   llm:
     api_key: ${AZURE_EMBEDDING_API_KEY}
-    type: azure_openai_embedding # or azure_openai_embedding / openai_embedding
+    type: azure_openai_embedding # or openai_embedding
     model: ${AZURE_EMBEDDING_MODEL_ID}
     api_base: ${AZURE_EMBEDDING_API_BASE}
     api_version: ${AZURE_EMBEDDING_API_VERSION}
-    deployment_name: ${AZURE_EMBEDDING_DEPLOYMENT_NAME}
-
-    # api_base: https://<instance>.openai.azure.com
-    # api_version: 2024-02-15-preview
+    # audience: "https://cognitiveservices.azure.com/.default"
     # organization: <organization_id>
-    # deployment_name: <azure_model_deployment_name>
+    deployment_name: ${AZURE_EMBEDDING_DEPLOYMENT_NAME}
     # tokens_per_minute: 150_000 # set a leaky bucket throttle
     # requests_per_minute: 10_000 # set a leaky bucket throttle
     # max_retries: 10
     # max_retry_wait: 10.0
     # sleep_on_rate_limit_recommendation: true # whether to sleep when azure suggests wait-times
     # concurrent_requests: 25 # the number of parallel inflight requests that may be made
-    # batch_size: 16 # the number of documents to send in a single request
-    # batch_max_tokens: 8191 # the maximum number of tokens to send in a single request
-    # target: required # or optional
-
 
 chunks:
   size: 1200
   overlap: 100
   group_by_columns: [id] # by default, we don't allow chunks to cross documents
-    
+
 input:
   type: file # or blob
   file_type: text # or csv
@@ -76,17 +83,25 @@ cache:
 
 storage:
   type: file # or blob
-  base_dir: "output/artifacts"
+  base_dir: "output"
+  # connection_string: <azure_blob_storage_connection_string>
+  # container_name: <azure_blob_storage_container_name>
+
+update_index_storage: # Storage to save an updated index (for incremental indexing). Enabling this performs an incremental index run
+  # type: file # or blob
+  # base_dir: "update_output"
   # connection_string: <azure_blob_storage_connection_string>
   # container_name: <azure_blob_storage_container_name>
 
 reporting:
   type: file # or console, blob
-  base_dir: "output/reports"
+  base_dir: "logs"
   # connection_string: <azure_blob_storage_connection_string>
   # container_name: <azure_blob_storage_container_name>
 
 entity_extraction:
+  ## strategy: fully override the entity extraction strategy.
+  ##   type: one of graph_intelligence, graph_intelligence_json and nltk
   ## llm: override the global llm settings for this task
   ## parallelization: override the global parallelization settings for this task
   ## async_mode: override the global async_mode settings for this task

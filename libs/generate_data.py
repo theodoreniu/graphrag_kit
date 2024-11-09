@@ -43,7 +43,7 @@ import streamlit_authenticator as stauth
 from  libs.common import is_login
 import libs.config as config
 
-def genearate_data(rag_version: str):
+def generate_data(rag_version: str):
     st.markdown(f"## Attention")
     st.markdown(f"- Do not process txt files")
     st.markdown(f"- PDF will be converted to txt")
@@ -52,7 +52,7 @@ def genearate_data(rag_version: str):
     
     st.markdown(f"--------------")
     options = [
-        'GPT-4o-mini Vison (Composed of text)', 
+        'GPT-4o-mini Vision (Composed of text)', 
         'Azure AI Document Intelligence (Composed of images)'
         ]
     pdf_vision_option = st.radio('Please select a method to process the PDF:',
@@ -60,11 +60,11 @@ def genearate_data(rag_version: str):
                                  options =options)
 
     if st.button('Start Generate' ,key=f"generate_btn_{rag_version}"):
-        for root, dirs, files in os.walk(f"/app/index/{config.tenant_name}/{rag_version}/original"):
+        for root, dirs, files in os.walk(f"/app/projects/{rag_version}/original"):
             for file in files:
                 file_path = os.path.join(root, file)
                 prepare_file(file_path, file, rag_version)
-        for root, dirs, files in os.walk(f"/app/index/{config.tenant_name}/{rag_version}/input"):
+        for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
             for file in files:
                 file_path = os.path.join(root, file)
                 convert_file(file_path, file, rag_version, pdf_vision_option)
@@ -72,11 +72,11 @@ def genearate_data(rag_version: str):
 
     st.markdown(f"--------------")
     if st.button("Clear generated files", key=f"delete_all_input_files_{rag_version}"):
-        run_command(f"rm -rf /app/index/{config.tenant_name}/{rag_version}/input/*")
+        run_command(f"rm -rf /app/projects/{rag_version}/input/*")
         time.sleep(3)
         st.success("All files deleted.")
     if st.button("Clear cached files", key=f"delete_all_cached_files_{rag_version}"):
-        run_command(f"rm -rf /app/index/{config.tenant_name}/{rag_version}/pdf_cache/*")
+        run_command(f"rm -rf /app/projects/{rag_version}/pdf_cache/*")
         time.sleep(3)
         st.success("All files deleted.")
 
@@ -95,7 +95,7 @@ def excel_to_txt(file_path,rag_version):
     file_name = os.path.basename(file_path)
     with open(file_path, "rb") as file:
         excel_data = pd.ExcelFile(file.read())
-        with open(f"/app/index/{config.tenant_name}/{rag_version}/input/{file_name}.txt", 'w', encoding='utf-8') as f:
+        with open(f"/app/projects/{rag_version}/input/{file_name}.txt", 'w', encoding='utf-8') as f:
             for sheet_name in excel_data.sheet_names:
                 f.write(f"{sheet_name}\n\n") 
                 df = excel_data.parse(sheet_name)
@@ -111,13 +111,13 @@ def prepare_file(file_path, file, rag_version):
             if has_download_files(file_path):
                 download_files_from_xlsx_csv(file_path, file, rag_version)
             else:
-                run_command(f"cp -r '{file_path}' /app/index/{config.tenant_name}/{rag_version}/input/")
+                run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
         if file.endswith('.txt'):
-            run_command(f"cp -r '{file_path}' /app/index/{config.tenant_name}/{rag_version}/input/")
+            run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
         if file.endswith('.pdf'):
-            run_command(f"cp -r '{file_path}' /app/index/{config.tenant_name}/{rag_version}/input/")
+            run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
         # if file.endswith('.zip'):
         #     deal_zip(file_path, rag_version)
@@ -153,8 +153,8 @@ def download_files_from_xlsx_csv(file_path,file, rag_version):
 
 def download_file(doc_url,index,df_count,rag_version):
     file_name = url_to_name(doc_url)
-    os.makedirs(f"/app/index/{config.tenant_name}/{rag_version}/input", exist_ok=True)     
-    file_path = os.path.join(f"/app/index/{config.tenant_name}/{rag_version}/input", file_name)  
+    os.makedirs(f"/app/projects/{rag_version}/input", exist_ok=True)     
+    file_path = os.path.join(f"/app/projects/{rag_version}/input", file_name)  
 
     if os.path.exists(file_path):
         st.write(f"[{index}/{df_count}] File already exists: {file_path}")

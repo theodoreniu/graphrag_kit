@@ -4,10 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-tenant_name = os.getenv('TENANT_NAME','rag')
-
-app_version="0.0.1"
-graphrag_version="0.3.6"
+app_version="0.0.2"
+graphrag_version="0.4.1"
 app_title = os.getenv('APP_TITLE', 'Demo')
 manage_tip = os.getenv('MANAGE_TIP', '')
 test_tip = os.getenv('TEST_TIP', '')

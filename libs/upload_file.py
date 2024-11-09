@@ -1,47 +1,18 @@
-import asyncio
 import logging
-import sys
 import time
 import tracemalloc
-import requests
-import uuid
-import tiktoken
-import pandas as pd
 import streamlit as st
 import zipfile
 import os
 import re
 import base64
 from dotenv import load_dotenv
-from langchain_community.chat_models import ChatOpenAI
 from streamlit.runtime.uploaded_file_manager import UploadedFile
-from streamlit_javascript import st_javascript
 
 
-from graphrag.query.llm.oai.typing import OpenaiApiType
-from graphrag.query.context_builder.entity_extraction import EntityVectorStoreKey
-from graphrag.query.llm.oai.chat_openai import ChatOpenAI
-from graphrag.query.indexer_adapters import (
-    read_indexer_entities,
-    read_indexer_relationships,
-    read_indexer_reports,
-    read_indexer_text_units,
-)
-from graphrag.query.input.loaders.dfs import store_entity_semantic_embeddings
-from graphrag.query.llm.oai.embedding import OpenAIEmbedding
-from graphrag.query.structured_search.local_search.mixed_context import LocalSearchMixedContext
-from libs.pgvector import PgVectorStore
-from libs.common import delete_rag_version, get_original_dir, list_files_and_sizes, rag_version_exists, run_command
-from io import StringIO
+from libs.common import get_original_dir, list_files_and_sizes, run_command
 from pathlib import Path
-from openai import OpenAI
-from theodoretools.url import url_to_name
-from theodoretools.fs import list_subdirectories
-import pdfplumber
-import csv
-import fitz
-import streamlit_authenticator as stauth
-from  libs.common import is_login,debug
+from  libs.common import debug
 import libs.config as config
 import pandas as pd
 
@@ -85,7 +56,7 @@ def upload_file(rag_version: str):
     )
     
     if st.button("Delete all files", key=f"delete_all_files_{rag_version}"):
-        run_command(f"rm -rf /app/index/{config.tenant_name}/{rag_version}/original/*")
+        run_command(f"rm -rf /app/projects/{rag_version}/original/*")
         time.sleep(3)
         st.success("All files deleted.")
         list_uploaded_files(file_list_container, rag_version)
@@ -94,8 +65,12 @@ def upload_file(rag_version: str):
 
     if len(uploaded_files) > 0:
         debug(uploaded_files)
+        
+        Path(f"/app/projects/{rag_version}/original").mkdir(parents=True, exist_ok=True)
+        Path(f"/app/projects/{rag_version}/input").mkdir(parents=True, exist_ok=True)
+                
         for uploaded_file in uploaded_files:
-            with open(f"/app/index/{config.tenant_name}/{rag_version}/original/{uploaded_file.name}", "wb") as f:
+            with open(f"/app/projects/{rag_version}/original/{uploaded_file.name}", "wb") as f:
                 f.write(uploaded_file.read())
         list_uploaded_files(file_list_container, rag_version)
         st.success('File uploaded successfully.')

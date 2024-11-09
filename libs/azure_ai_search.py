@@ -5,10 +5,7 @@
 import json
 from graphrag.vector_stores.azure_ai_search import AzureAISearch
 from graphrag.vector_stores.base import (
-    DEFAULT_VECTOR_SIZE,
-    BaseVectorStore,
     VectorStoreDocument,
-    VectorStoreSearchResult,
 )
 from azure.search.documents.indexes.models import (
     HnswAlgorithmConfiguration,

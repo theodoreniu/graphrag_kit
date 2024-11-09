@@ -1,25 +1,34 @@
-import io
 import re
 import os
 import subprocess
 import streamlit as st
 from theodoretools.fs import list_subdirectories
-import qrcode
 import libs.config as config
+from graphrag.config import (
+    load_config,
+)
+from pathlib import Path
+
+
+def project_path(project_name: str):
+    return Path("/app/projects") / project_name
+
+def load_graphrag_config(project_name: str):
+    return load_config(root_dir=project_path(project_name))
 
 def set_venvs(rag_version: str):
-    os.environ['GRAPHRAG_ENTITY_EXTRACTION_PROMPT_FILE'] = f"/app/index/{config.tenant_name}/{rag_version}/prompts/entity_extraction.txt"
-    os.environ['GRAPHRAG_COMMUNITY_REPORT_PROMPT_FILE'] = f"/app/index/{config.tenant_name}/{rag_version}/prompts/community_report.txt"
-    os.environ['GRAPHRAG_SUMMARIZE_DESCRIPTIONS_PROMPT_FILE'] = f"/app/index/{config.tenant_name}/{rag_version}/prompts/summarize_descriptions.txt"
+    os.environ['GRAPHRAG_ENTITY_EXTRACTION_PROMPT_FILE'] = str(Path("/app/projects") / rag_version / "prompts" / "entity_extraction.txt")
+    os.environ['GRAPHRAG_COMMUNITY_REPORT_PROMPT_FILE'] = f"/app/projects/{rag_version}/prompts/community_report.txt"
+    os.environ['GRAPHRAG_SUMMARIZE_DESCRIPTIONS_PROMPT_FILE'] = f"/app/projects/{rag_version}/prompts/summarize_descriptions.txt"
 
 def check_rag_complete(rag_version: str):
-    base_path = f"/app/index/{config.tenant_name}/{rag_version}"
+    base_path = f"/app/projects/{rag_version}"
     subdirectories = list_subdirectories(path=f"{base_path}/output")
     if len(subdirectories) == 0:
         raise Exception("Your need to build index first.")
 
 def get_original_dir(rag_version: str):
-    return f"/app/index/{config.tenant_name}/{rag_version}/original"
+    return f"/app/projects/{rag_version}/original"
 
 def list_files_and_sizes(directory: str):
     file_list = []
@@ -41,34 +50,30 @@ def debug(data:any, title:str=""):
 def format_rag_version(version: str):
     if not re.match("^[A-Za-z0-9]*$", version):
         raise ValueError("输入版本只能包含英文字母和数字，不允许其他符号。")
-    return version.lower()
+    return 'rag_' + version.lower()
 
 def delete_rag_version(version: str):
-    run_command(f"rm -rf /app/index/{config.tenant_name}/{version}")
+    run_command(f"rm -rf /app/projects/{version}")
     st.success(f"Deleted {version}")
 
 def rag_version_exists(version: str):
-    version_path = f'/app/index/{config.tenant_name}/{version}'
+    version_path = f'/app/projects/{version}'
     return os.path.exists(version_path)
 
 def get_rag_versions():
-    varsion_path = f'/app/index/{config.tenant_name}'
-    debug(f"scan to find versions in {varsion_path}")
-    versions = list_subdirectories(varsion_path)
-    # versions = [v for v in versions if v.startswith(config.tenant_name)]
+    version_path = f'/app/projects'
+    debug(f"scan to find versions in {version_path}")
+    versions = list_subdirectories(version_path)
     return versions
 
-def is_login(password: str):
+def is_login():
+    if not config.app_password:
+        return True
     if 'password' not in st.session_state:
         return False
-    if st.session_state.password != password:
+    if st.session_state.password != config.app_password:
         return False
     return True
-
-def create_session_files(rag_version: str):
-    run_command(f"mkdir -p /app/index/{config.tenant_name}/{rag_version}/input")
-    run_command(f"mkdir -p /app/index/{config.tenant_name}/{rag_version}/original")
-    run_command(f"cp -r ./ragtest/* /app/index/{config.tenant_name}/{rag_version}/")
 
 
 def javascript_code():

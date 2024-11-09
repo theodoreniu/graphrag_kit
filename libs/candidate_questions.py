@@ -34,7 +34,7 @@ async def run_candidate_questions(
         question_history: list[str],
         callbacks: list[BaseLLMCallback] | None = None,
         ):
-    input_dir = f"/app/index/{config.tenant_name}/{rag_version}/output/artifacts"
+    input_dir = f"/app/projects/{rag_version}/output/artifacts"
 
     # Load tables to dataframes
 
