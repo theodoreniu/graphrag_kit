@@ -40,13 +40,13 @@ embeddings:
     container_name: default # A prefix for the vector store to create embedding containers. Default: 'default'.
     overwrite: true
   # vector_store: # configuration for AI Search
-  #   type: azure_ai_search
-  #   url: ${AI_SEARCH_URL}
-  #   api_key: ${AI_SEARCH_KEY}
-  #   # if not set, will attempt to use managed identity. Expects the `Search Index Data Contributor` RBAC role in this case.
-  #   # audience: <optional> # if using managed identity, the audience to use for the token
-  #   overwrite: true # or false. Only applicable at index creation time
-  #   container_name: default # A prefix for the AzureAISearch to create indexes. Default: 'default'.
+    # type: azure_ai_search
+    # url: ${AI_SEARCH_URL}
+    # api_key: ${AI_SEARCH_KEY}
+    # container_name: default # A prefix for the AzureAISearch to create indexes. Default: 'default'.
+    # overwrite: true # or false. Only applicable at index creation time
+    # if not set, will attempt to use managed identity. Expects the `Search Index Data Contributor` RBAC role in this case.
+    # audience: <optional> # if using managed identity, the audience to use for the token
   llm:
     api_key: ${AZURE_EMBEDDING_API_KEY}
     type: azure_openai_embedding # or openai_embedding

@@ -36,8 +36,7 @@ def page(title: str):
     with c1:
         project_name = st.selectbox("Projects", rag_versions_list)
     with c2:
-        db = "PG"
-        # db = st.selectbox("Vector DB", options)
+        community_level = st.text_input("community_level", value=2)
 
     query = st.text_area(label="search",
                          label_visibility='hidden',
@@ -58,7 +57,7 @@ def page(title: str):
                 (response, context_data) = run_local_search(
                     root_dir=project_path(project_name),
                     query=improve_query(project_name, query),
-                    community_level=2,
+                    community_level=int(community_level),
                     response_type="Multiple Paragraphs",
                     streaming=False,
                     config_filepath=None,
@@ -76,7 +75,7 @@ def page(title: str):
                 (response, context_data) = run_global_search(
                     root_dir=project_path(project_name),
                     query=improve_query(project_name, query),
-                    community_level=2,
+                    community_level=int(community_level),
                     response_type="Multiple Paragraphs",
                     streaming=False,
                     config_filepath=None,
@@ -95,7 +94,7 @@ def page(title: str):
                 (response, context_data) = run_drift_search(
                     root_dir=project_path(project_name),
                     query=improve_query(project_name, query),
-                    community_level=2,
+                    community_level=int(community_level),
                     streaming=False,
                     config_filepath=None,
                     data_dir=None,

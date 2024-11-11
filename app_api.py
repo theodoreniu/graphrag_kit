@@ -28,8 +28,8 @@ app.add_middleware(
 
 class Item(BaseModel):
     query: str
-    project_name: str
-    db: str
+    rag_version: str
+    community_level: str
 
 
 # -----------------------------------------------------------------
@@ -49,8 +49,8 @@ def local_search(item: Item, api_key: str=Header(...)):
         
         (response, context_data) = run_local_search(
                     root_dir=project_path(item.project_name),
-                    query=improve_query(item.project_name, item.query),
-                    community_level=2,
+                    query=improve_query(item.rag_version, item.query),
+                    community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
                     streaming=False,
                     config_filepath=None,
@@ -79,8 +79,8 @@ def global_search(item: Item, api_key: str=Header(...)):
 
         (response, context_data) = run_global_search(
                     root_dir=project_path(item.project_name),
-                    query=improve_query(item.project_name, item.query),
-                    community_level=2,
+                    query=improve_query(item.rag_version, item.query),
+                    community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
                     streaming=False,
                     config_filepath=None,
@@ -108,8 +108,8 @@ def global_search(item: Item, api_key: str=Header(...)):
 
         (response, context_data) = run_drift_search(
                     root_dir=project_path(item.project_name),
-                    query=improve_query(item.project_name, item.query),
-                    community_level=2,
+                    query=improve_query(item.rag_version, item.query),
+                    community_level=int(item.community_level),
                     streaming=False,
                     config_filepath=None,
                     data_dir=None,

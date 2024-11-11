@@ -30,7 +30,7 @@ def initialize_project(path):
 def overwrite_settings_yaml(root, new_rag_version):
     settings_yaml = f"{root}/settings.yaml"
     template_settings_yaml = f"/app/template/setting.yaml"
-    container_name = new_rag_version
+    container_name = f"{config.app_name}_{new_rag_version}"
     with open(template_settings_yaml, "r") as t:
         with open(settings_yaml, "w") as f:
             new_settings_yaml = t.read().replace("container_name: default", f"container_name: {container_name}")
