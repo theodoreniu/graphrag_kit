@@ -18,7 +18,7 @@ def improve_query(rag_version: str, query: str):
 
 
 def get_prompt(rag_version: str):
-    prompt_txt = f"/app/index/{config.tenant_name}/{rag_version}/prompts/prompt.txt"
+    prompt_txt = f"/app/projects/{rag_version}/prompts/prompt.txt"
     if not os.path.exists(prompt_txt):
         return """-Your Role-
 You are an intelligent assistant.
@@ -37,7 +37,7 @@ def check_prompt(content:str):
     return True
 
 def set_prompt(rag_version: str):
-    prompt_txt = f"/app/index/{config.tenant_name}/{rag_version}/prompts/prompt.txt"
+    prompt_txt = f"/app/projects/{rag_version}/prompts/prompt.txt"
 
     prompt = get_prompt(rag_version)
 

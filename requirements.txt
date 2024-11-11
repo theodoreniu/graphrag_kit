@@ -1,7 +1,8 @@
-graphrag==0.3.6
+graphrag==0.4.1
+streamlit==1.40.0
+theodoretools==0.0.11
 python-dotenv~=1.0.1
 pyodbc==5.1.0
-streamlit==1.39.0
 streamlit-chat==0.1.1
 qrcode==7.4.2
 psycopg2-binary==2.9.9
@@ -22,7 +23,6 @@ openai==1.53.0
 httpx==0.27.2
 streamlit-authenticator==0.4.1
 azure-ai-documentintelligence==1.0.0b4
-theodoretools==0.0.8
 azure-ai-formrecognizer==3.3.3
 streamlit_code_editor==0.1.21
 streamlit-ace==0.1.1

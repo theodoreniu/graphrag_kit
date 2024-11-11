@@ -1,49 +1,17 @@
-import asyncio
-import logging
-import sys
 import time
-import tracemalloc
 import requests
-import uuid
 
-import tiktoken
 import pandas as pd
 import streamlit as st
-import zipfile
 import os
 import re
-import base64
-from dotenv import load_dotenv
-from langchain_community.chat_models import ChatOpenAI
-from streamlit.runtime.uploaded_file_manager import UploadedFile
-from streamlit_javascript import st_javascript
 
-
-from graphrag.query.llm.oai.typing import OpenaiApiType
-from graphrag.query.context_builder.entity_extraction import EntityVectorStoreKey
-from graphrag.query.llm.oai.chat_openai import ChatOpenAI
-from graphrag.query.indexer_adapters import (
-    read_indexer_entities,
-    read_indexer_relationships,
-    read_indexer_reports,
-    read_indexer_text_units,
-)
-from graphrag.query.input.loaders.dfs import store_entity_semantic_embeddings
-from graphrag.query.llm.oai.embedding import OpenAIEmbedding
-from graphrag.query.structured_search.local_search.mixed_context import LocalSearchMixedContext
-from libs.pgvector import PgVectorStore
-from libs.common import delete_rag_version, rag_version_exists, run_command, javascript_code, get_rag_versions, format_rag_version
-from io import StringIO
-from pathlib import Path
-from openai import OpenAI
+from libs.common import run_command
+from libs.config import generate_data_vision, generate_data_vision_ocr, generate_data_vision_di
 from theodoretools.url import url_to_name
-from theodoretools.fs import list_subdirectories
-import pdfplumber
-import streamlit_authenticator as stauth
-from  libs.common import is_login
-import libs.config as config
 
-def genearate_data(rag_version: str):
+
+def generate_data(rag_version: str):
     st.markdown(f"## Attention")
     st.markdown(f"- Do not process txt files")
     st.markdown(f"- PDF will be converted to txt")
@@ -52,19 +20,20 @@ def genearate_data(rag_version: str):
     
     st.markdown(f"--------------")
     options = [
-        'GPT-4o-mini Vison (Composed of text)', 
-        'Azure AI Document Intelligence (Composed of images)'
+        generate_data_vision,
+        generate_data_vision_ocr,
+        generate_data_vision_di
         ]
     pdf_vision_option = st.radio('Please select a method to process the PDF:',
-                                 key=f"db_{rag_version}", 
-                                 options =options)
+                                 key=f"db_{rag_version}",
+                                 options=options)
 
-    if st.button('Start Generate' ,key=f"generate_btn_{rag_version}"):
-        for root, dirs, files in os.walk(f"/app/index/{config.tenant_name}/{rag_version}/original"):
+    if st.button('Start Generate' , key=f"generate_btn_{rag_version}"):
+        for root, dirs, files in os.walk(f"/app/projects/{rag_version}/original"):
             for file in files:
                 file_path = os.path.join(root, file)
                 prepare_file(file_path, file, rag_version)
-        for root, dirs, files in os.walk(f"/app/index/{config.tenant_name}/{rag_version}/input"):
+        for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
             for file in files:
                 file_path = os.path.join(root, file)
                 convert_file(file_path, file, rag_version, pdf_vision_option)
@@ -72,30 +41,31 @@ def genearate_data(rag_version: str):
 
     st.markdown(f"--------------")
     if st.button("Clear generated files", key=f"delete_all_input_files_{rag_version}"):
-        run_command(f"rm -rf /app/index/{config.tenant_name}/{rag_version}/input/*")
+        run_command(f"rm -rf /app/projects/{rag_version}/input/*")
         time.sleep(3)
         st.success("All files deleted.")
     if st.button("Clear cached files", key=f"delete_all_cached_files_{rag_version}"):
-        run_command(f"rm -rf /app/index/{config.tenant_name}/{rag_version}/pdf_cache/*")
+        run_command(f"rm -rf /app/projects/{rag_version}/pdf_cache/*")
         time.sleep(3)
         st.success("All files deleted.")
+
 
 def convert_file(file_path, file, rag_version, pdf_vision_option):
     
     if file.endswith('.xlsx') or file.endswith('.csv'):
         st.write(f"converting {file}")
-        excel_to_txt(file_path,rag_version)
+        excel_to_txt(file_path, rag_version)
 
     if file.endswith('.pdf'):
         st.write(f"converting {file}")
         pdf_to_txt(file_path, rag_version, pdf_vision_option)
     
 
-def excel_to_txt(file_path,rag_version):
+def excel_to_txt(file_path, rag_version):
     file_name = os.path.basename(file_path)
     with open(file_path, "rb") as file:
         excel_data = pd.ExcelFile(file.read())
-        with open(f"/app/index/{config.tenant_name}/{rag_version}/input/{file_name}.txt", 'w', encoding='utf-8') as f:
+        with open(f"/app/projects/{rag_version}/input/{file_name}.txt", 'w', encoding='utf-8') as f:
             for sheet_name in excel_data.sheet_names:
                 f.write(f"{sheet_name}\n\n") 
                 df = excel_data.parse(sheet_name)
@@ -106,22 +76,22 @@ def excel_to_txt(file_path,rag_version):
                         f.write(f"【{column}】: {row[column]} ") 
                     f.write(f"\n\n") 
 
+
 def prepare_file(file_path, file, rag_version):
         if file.endswith('.xlsx') or file.endswith('.csv'):
             if has_download_files(file_path):
                 download_files_from_xlsx_csv(file_path, file, rag_version)
             else:
-                run_command(f"cp -r '{file_path}' /app/index/{config.tenant_name}/{rag_version}/input/")
+                run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
         if file.endswith('.txt'):
-            run_command(f"cp -r '{file_path}' /app/index/{config.tenant_name}/{rag_version}/input/")
+            run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
         if file.endswith('.pdf'):
-            run_command(f"cp -r '{file_path}' /app/index/{config.tenant_name}/{rag_version}/input/")
+            run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
         # if file.endswith('.zip'):
         #     deal_zip(file_path, rag_version)
-
 
 
 def has_download_files(file_path: str):
@@ -136,25 +106,26 @@ def has_download_files(file_path: str):
                     return True
     return False
 
-def download_files_from_xlsx_csv(file_path,file, rag_version):
+
+def download_files_from_xlsx_csv(file_path, file, rag_version):
     if not file_path.endswith('.xlsx') and not file_path.endswith('.csv'):
         return
 
     with open(file_path, "rb") as f:
         df = pd.read_excel(f.read())
         st.write(df)
-        df_count = len(df)-1
+        df_count = len(df) - 1
         with st.spinner(f"Processing ..."):
             for index, row in df.iterrows():
                 if 'doc_url' in row:
                     doc_url = row['doc_url']
-                    download_file(doc_url,index,df_count,rag_version)
+                    download_file(doc_url, index, df_count, rag_version)
 
 
-def download_file(doc_url,index,df_count,rag_version):
+def download_file(doc_url, index, df_count, rag_version):
     file_name = url_to_name(doc_url)
-    os.makedirs(f"/app/index/{config.tenant_name}/{rag_version}/input", exist_ok=True)     
-    file_path = os.path.join(f"/app/index/{config.tenant_name}/{rag_version}/input", file_name)  
+    os.makedirs(f"/app/projects/{rag_version}/input", exist_ok=True)     
+    file_path = os.path.join(f"/app/projects/{rag_version}/input", file_name)  
 
     if os.path.exists(file_path):
         st.write(f"[{index}/{df_count}] File already exists: {file_path}")
@@ -204,7 +175,6 @@ def replace_classify(markdown_text: str):
     return markdown_text
 
 
-
 def download_image(image_url, output_dir, image_index):
     image_extension = image_url.split('.')[-1].split('?')[0]
 
@@ -225,7 +195,6 @@ def download_image(image_url, output_dir, image_index):
     except requests.exceptions.RequestException as e:
         print(f"Error downloading {image_url}: {e}")
         return None
-
 
 
 def read_pdf(file_path):

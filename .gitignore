@@ -1,5 +1,7 @@
 index/*
 !index/.gitkeep
+projects/*
+!projects/.gitkeep
 __pycache__/
 .venv
 .vscode
