@@ -12,6 +12,7 @@ from graphrag.cli.initialize import initialize_project_at
 
 load_dotenv()
 
+
 def initialize_project(path):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -25,6 +26,7 @@ def initialize_project(path):
     finally:
         loop.close()
 
+
 def overwrite_settings_yaml(root, new_rag_version):
     settings_yaml = f"{root}/settings.yaml"
     template_settings_yaml = f"/app/template/setting.yaml"
@@ -34,9 +36,10 @@ def overwrite_settings_yaml(root, new_rag_version):
             new_settings_yaml = t.read().replace("container_name: default", f"container_name: {container_name}")
             f.write(new_settings_yaml)
 
+
 def create_version():
     st.markdown("----------------------------")
-    st.markdown("# Build New Project")
+    st.markdown("# New Project")
     today_hour = time.strftime("%Y%m%d%H", time.localtime())
 
     new_rag_version = st.text_input("Please input name",

@@ -1,11 +1,8 @@
-from fastapi.responses import FileResponse, RedirectResponse
-from libs.common import set_venvs
+from fastapi.responses import FileResponse
+from libs.common import project_path
 from libs.set_prompt import improve_query
-from libs.store_vector import PG
-from openai import AzureOpenAI
-from fastapi import FastAPI, Request, Header, HTTPException
+from fastapi import FastAPI, Header
 from pydantic import BaseModel
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import libs.config as config
 import os
@@ -31,65 +28,99 @@ app.add_middleware(
 
 class Item(BaseModel):
     query: str
-    rag_version: str
+    project_name: str
     db: str
 
 
 # -----------------------------------------------------------------
 @app.get("/favicon.ico")
-async def favicon():
+def favicon():
    return FileResponse(os.path.join("avatars", "favicon.ico"))
 
 
 # -----------------------------------------------------------------
 @app.post("/api/local_search")
-async def local_search(item: Item, api_key: str=Header(...)):
+def local_search(item: Item, api_key: str=Header(...)):
     try:
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
         
-        set_venvs(item.rag_version)
+        # set_venvs(item.rag_version)
         
-        result = await run_local_search(
-            rag_version=item.rag_version,
-            db=item.db,
-            query=improve_query(item.rag_version, item.query),
-        )
+        (response, context_data) = run_local_search(
+                    root_dir=project_path(item.project_name),
+                    query=improve_query(item.project_name, item.query),
+                    community_level=2,
+                    response_type="Multiple Paragraphs",
+                    streaming=False,
+                    config_filepath=None,
+                    data_dir=None,
+                )
 
         return {
                 "message": "ok",
-                "tenant_name": config.tenant_name,
-                "result": result.response
+                "response": response,
+                "context_data": context_data
             }
     except Exception as e:
         return {
-                "tenant_name": config.tenant_name,
                 "error": str(e),
                }
 
 
 # -----------------------------------------------------------------
 @app.post("/api/global_search")
-async def global_search(item: Item, api_key: str=Header(...)):
+def global_search(item: Item, api_key: str=Header(...)):
     try:
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
         
-        set_venvs(item.rag_version)
+        # set_venvs(item.rag_version)
 
-        result = await run_global_search(
-            rag_version=item.rag_version,
-            db=item.db,
-            query=improve_query(item.rag_version, item.query),
-        )
+        (response, context_data) = run_global_search(
+                    root_dir=project_path(item.project_name),
+                    query=improve_query(item.project_name, item.query),
+                    community_level=2,
+                    response_type="Multiple Paragraphs",
+                    streaming=False,
+                    config_filepath=None,
+                    data_dir=None,
+                )
 
         return {
                 "message": "ok",
-                "tenant_name": config.tenant_name,
-                "result": result.response
+                "response": response,
+                "context_data": context_data
             }
     except Exception as e:
         return {
-                "tenant_name": config.tenant_name,
+                "error": str(e),
+               }
+
+
+@app.post("/api/drift_search")
+def global_search(item: Item, api_key: str=Header(...)):
+    try:
+        if config.api_key != api_key:
+            raise Exception("Invalid api-key")
+        
+        # set_venvs(item.rag_version)
+
+        (response, context_data) = run_drift_search(
+                    root_dir=project_path(item.project_name),
+                    query=improve_query(item.project_name, item.query),
+                    community_level=2,
+                    streaming=False,
+                    config_filepath=None,
+                    data_dir=None,
+                )
+
+        return {
+                "message": "ok",
+                "response": response,
+                "context_data": context_data
+            }
+    except Exception as e:
+        return {
                 "error": str(e),
                }

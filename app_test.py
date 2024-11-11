@@ -47,7 +47,7 @@ def page(title: str):
     
     st.markdown("Local Search: https://microsoft.github.io/graphrag/query/local_search/")
     st.markdown("Global Search: https://microsoft.github.io/graphrag/query/global_search/")
-    st.markdown("Question Generation: https://microsoft.github.io/graphrag/query/question_generation/")
+    st.markdown("DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
     st.markdown("------------------------")
             
     if st.button('Local Search', key="local_search"):
