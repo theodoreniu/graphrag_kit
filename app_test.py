@@ -1,12 +1,8 @@
 
-import io
 import streamlit as st
 from dotenv import load_dotenv
 
-from libs.candidate_questions import run_candidate_questions
 from libs.common import get_rag_versions, project_path
-from contextlib import redirect_stdout
-from libs.search import LLMCallback
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
 
@@ -124,8 +120,9 @@ def page(title: str):
 
 if __name__ == "__main__":
 
-        page_title = F"GraphRAG Test for {config.app_title}"
-        st.set_page_config(page_title=page_title,
+        page_title = "GraphRAG Test"
+        st.set_page_config(
+            page_title=page_title,
                             page_icon="avatars/favicon.ico",
                             layout="wide",
                             initial_sidebar_state='expanded')

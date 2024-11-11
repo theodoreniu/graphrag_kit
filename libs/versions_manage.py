@@ -6,7 +6,6 @@ import os
 from dotenv import load_dotenv
 from libs.save_settings import set_settings
 
-
 from libs.index_preview import index_preview
 from libs.common import delete_rag_version, get_rag_versions
 from theodoretools.fs import get_directory_size
@@ -49,14 +48,14 @@ def versions_manage():
         if show_expander:
             with st.expander(f"#### {rag_version} {size_mb}"):
                 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-                    "1-Upload Files", 
-                    "2-Generate Data", 
-                    "3-GraphRAG Settings", 
-                    "4-Build GraphRAG", 
-                    "5-Index Preview", 
+                    "1-Upload Files",
+                    "2-Generate Data",
+                    "3-GraphRAG Settings",
+                    "4-Build GraphRAG",
+                    "5-Index Preview",
                     # "6-Store Vectors", 
-                    "6-Prompt Tuning", 
-                    "7-Set Prompt", 
+                    "6-Prompt Tuning",
+                    "7-Set Prompt",
                     "8-Delete"
                     ])
                 with tab1:
@@ -80,6 +79,4 @@ def versions_manage():
                         delete_rag_version(rag_version)
                         show_expander = False
                         st.session_state[f"show_expander_{rag_version}"] = False
-                    
-
 

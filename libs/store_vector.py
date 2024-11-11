@@ -18,6 +18,7 @@ MILVUS = 'milvus'
 LANCE = 'lance'
 AI_SEARCH = 'Azure AI Search'
 
+
 def store_vector(rag_version: str):
 
     if not config.disable_aisearch and st.button(f'Store data on {AI_SEARCH}', key=f"store_vector_aisearch_{rag_version}"):
@@ -31,7 +32,8 @@ def store_vector(rag_version: str):
     # if st.button('Store Milvus', key=f"store_vector_milvus_{rag_version}"):
     #         store_vector_pgvector(rag_version=rag_version, db=MILVUS) 
 
-def store_vector_pgvector(rag_version: str, db: str = PG):
+
+def store_vector_pgvector(rag_version: str, db: str=PG):
     base_path = f"/app/projects/{rag_version}"
     
     subdirectories = list_subdirectories(path=f"{base_path}/output")
@@ -66,7 +68,7 @@ def store_vector_pgvector(rag_version: str, db: str = PG):
         st.success(f"Semantic embeddings stored") 
 
 
-def get_embedding_store(db:str,rag_version:str):
+def get_embedding_store(db:str, rag_version:str):
     if db == PG:
         return get_pg_vector_store(rag_version)
     if db == MILVUS:
@@ -80,7 +82,7 @@ def get_embedding_store(db:str,rag_version:str):
 
 
 def get_pg_vector_store(rag_version: str):
-        collection_name=f"entity_embeddings_{rag_version}"
+        collection_name = f"entity_embeddings_{rag_version}"
         embedding_store = PgVectorStore(
             collection_name=collection_name,
         )
@@ -94,9 +96,10 @@ def get_pg_vector_store(rag_version: str):
 
         return embedding_store
 
+
 def get_lancedb_store(rag_version: str):
-        db_uri='/data/lancedb'
-        collection_name=f"entity_embeddings_{rag_version}"
+        db_uri = '/data/lancedb'
+        collection_name = f"entity_embeddings_{rag_version}"
         embedding_store = LanceDBVectorStore(
             db_uri=db_uri,
             collection_name=collection_name,
@@ -107,8 +110,9 @@ def get_lancedb_store(rag_version: str):
         )
         return embedding_store
 
+
 def get_ai_search_store(rag_version: str):
-        collection_name=f"entity_embeddings_{rag_version}"
+        collection_name = f"entity_embeddings_{rag_version}"
         embedding_store = AzureAISearch(
              collection_name=collection_name
         )
@@ -117,6 +121,7 @@ def get_ai_search_store(rag_version: str):
             api_key=config.ai_search_key,
         )
         return embedding_store
+
 
 def get_mivlus_store(rag_version: str):
     raise Exception("Not implemented yet")

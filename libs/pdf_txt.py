@@ -10,28 +10,31 @@ from azure.core.credentials import AzureKeyCredential
 from azure.ai.formrecognizer import DocumentAnalysisClient
 
 client = AzureOpenAI(
-    api_version=config.azure_api_version,
-    azure_endpoint=config.azure_api_base,
-    azure_deployment=config.azure_chat_deployment_name,
-    api_key=config.azure_api_key,
+    api_version=config.data_azure_api_version,
+    azure_endpoint=config.data_azure_api_base,
+    azure_deployment=config.data_azure_chat_deployment_name,
+    api_key=config.data_azure_api_key,
 )
+
 
 def image_to_base64(image_path:str):
     with open(image_path, "rb") as image_file:
         base64_encoded = base64.b64encode(image_file.read()).decode("utf-8")
     return base64_encoded
 
+
 class PageTask:
-    def __init__(self,doc,pdf_path, rag_version, pdf_vision_option, page_num):
-        self.doc =doc
+
+    def __init__(self, doc, pdf_path, rag_version, pdf_vision_option, page_num):
+        self.doc = doc
         self.pdf_name = os.path.basename(pdf_path)
         self.rag_version = rag_version   
         self.pdf_vision_option = pdf_vision_option
-        self.pdf_vision_option_foramt = pdf_vision_option.replace(" ", "")
+        self.pdf_vision_option_format = pdf_vision_option.replace(" ", "")
         self.base_name = f"/app/projects/{rag_version}/pdf_cache"
         self.img_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png"
         self.txt_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png.txt"
-        self.ai_txt_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png.{self.pdf_vision_option_foramt}.txt"
+        self.ai_txt_path = f"{self.base_name}/{self.pdf_name}_page_{page_num + 1}.png.{self.pdf_vision_option_format}.txt"
         self.page_num = page_num
     
     def page_to_image(self):
@@ -43,15 +46,9 @@ class PageTask:
     def page_to_txt(self):
         page_txt = self.doc[self.page_num].get_text("text")
         with open(self.txt_path, "w") as txt_file:
-            txt_file.write(page_txt )
+            txt_file.write(page_txt)
             st.write(f"[{self.page_num}/{self.doc.page_count}] {self.txt_path}")
         return page_txt
-    
-    def page_to_txt_vision(self):
-        return fix_txt_postion(self.img_path, self.page_to_txt())
-
-    def page_to_txt_di(self):
-        return analyze_read(self.img_path)
     
     def get_ai_txt(self):
         if os.path.exists(self.ai_txt_path):
@@ -60,18 +57,23 @@ class PageTask:
 
         self.page_to_image()
 
-        if self.pdf_vision_option.startswith("Azure AI Document Intelligence"):
-            ai_txt = self.page_to_txt_di()
-        else:
-            ai_txt = self.page_to_txt_vision()
+        if self.pdf_vision_option == config.generate_data_vision:
+            ai_txt = fix_txt_position(self.img_path, self.page_to_txt())
+            
+        if self.pdf_vision_option == config.generate_data_vision_ocr:
+            ai_txt = fix_txt_position_ocr(self.img_path, self.page_to_txt())
 
+        if self.pdf_vision_option == config.generate_data_vision_di:
+            ai_txt = analyze_read(self.img_path)
+            
         with open(self.ai_txt_path, "w") as txt_file:
             txt_file.write(ai_txt)
             st.write(f"[{self.page_num}/{self.doc.page_count}] {self.ai_txt_path}")
         
         return ai_txt
+
     
-def save_pdf_pages_as_images(pdf_path:str, rag_version:str, pdf_vision_option):
+def save_pdf_pages_as_images(pdf_path:str, rag_version:str, pdf_vision_option: str):
     pdf_ai_txt_path = f"{pdf_path}.txt"
     base_dir = f"/app/projects/{rag_version}/pdf_cache"
     os.makedirs(base_dir, exist_ok=True)
@@ -104,7 +106,7 @@ def save_pdf_pages_as_images(pdf_path:str, rag_version:str, pdf_vision_option):
             f.write(pt.get_ai_txt())
 
 
-def fix_txt_postion(img_path: str, page_txt: str):
+def fix_txt_position(img_path: str, page_txt: str):
     base64_string = image_to_base64(img_path)
     
     completion = client.chat.completions.create(
@@ -113,8 +115,38 @@ def fix_txt_postion(img_path: str, page_txt: str):
                 "role": "user",
                 "content": [
                     {
-                "type": "text", 
+                "type": "text",
                 "text": f"我给你一张截图，是一个产品使用说明书的pdf的某一页的截图，同时，我把这个截图里的所有文字也给你，但是文字的排版和位置可能是错乱的，不是人类阅读产品手册的顺序和位置，但是文字是没有错误的没有多余的。 请你运用视觉能力，全面的观察分析这个截图的每一处排版和每一块文字，然后把文字还原成有结构的、位置正确的文本。把文字放在该放的段落里，也就是人类阅读顺序的位置里。你一定不要增加其他任何的文字，也不要自己创造。一定不要生成任何多余的文字(甚至不要返回你做了什么，你一定只需要返回整理之后的文字)。总之，你要分析图像，然后把没有结构的散乱的文字还原成有结构的文字。 一定不要生成原始文字里没有的文字或者句子。截图里的所有原始文字如下：\n\n {page_txt}"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_string}" ,
+                    }
+                },
+                ]
+            }
+            
+        ],
+        model=config.azure_chat_model_id,
+    )
+    ai_txt = completion.choices[0].message.content
+    print(ai_txt)
+
+    return ai_txt
+
+
+def fix_txt_position_ocr(img_path: str, page_txt: str):
+    base64_string = image_to_base64(img_path)
+    
+    completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                "type": "text",
+                "text": f"给你一张截图，是 PDF 的某一页的截图，请你运用视觉能力，全面的观察分析这个截图的每一处排版和每一块文字，提取和识别文字，然后把文字还原成有结构的、位置正确的文本。把文字放在该放的段落里，也就是人类阅读顺序的位置里。\n\n 任务要求：\n\n 尽可能给我 markdown 文本\n\n 你一定不要自己创造任何多余的文字 \n\nn 不要返回你做了什么，你一定只需要返回整理之后的文字。\n\n 截图里的所有原始文字如下：\n\n {page_txt}"
             },
             {
                 "type": "image_url",
@@ -156,7 +188,7 @@ def analyze_read(img_path: str):
         )
         
         poller = document_analysis_client.begin_analyze_document(
-                "prebuilt-read", 
+                "prebuilt-read",
                 document=file_data
                 )
         result = poller.result()
@@ -194,6 +226,5 @@ def analyze_read(img_path: str):
 
         print("====================================")
         return result.content
-
 
     return ""

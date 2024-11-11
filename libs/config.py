@@ -4,10 +4,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app_version="0.0.2"
-graphrag_version="0.4.1"
-app_title = os.getenv('APP_TITLE', 'Demo')
+app_version = "0.0.2"
+graphrag_version = "0.4.1"
+
 manage_tip = os.getenv('MANAGE_TIP', '')
+app_name = os.getenv('APP_NAME', 'rag')
 test_tip = os.getenv('TEST_TIP', '')
 app_password = os.getenv('APP_PASSWORD')
 
@@ -46,4 +47,8 @@ di_url = os.getenv('DOCUMENT_INTELLIGENCE_URL', '')
 di_key = os.getenv('DOCUMENT_INTELLIGENCE_KEY', '')
 
 disable_pgvector = os.getenv('DISABLE_PGVECTOR', False)
-disable_aisearch = os.getenv('DISABLE_AI_SAERCH', False)
+disable_aisearch = os.getenv('DISABLE_AI_SEARCH', False)
+
+generate_data_vision = 'GPT Vision (as text)'
+generate_data_vision_ocr = 'GPT Vision (as image)'
+generate_data_vision_di = 'Azure AI Document Intelligence (as image)'

@@ -44,5 +44,5 @@ def prompt_tuning(rag_version: str):
     base_path = f"/app/projects/{rag_version}"
 
     if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}"):
-    
-        asyncio.run(start(base_path))
+        with st.spinner("Running..."):
+            asyncio.run(start(base_path))

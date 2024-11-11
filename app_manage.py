@@ -40,13 +40,12 @@ def page(title: str):
 
 if __name__ == "__main__":
     try:
-        page_title = F"GraphRAG Manage for {config.app_title}"
+        page_title = "GraphRAG Manage"
         st.set_page_config(page_title=page_title,
                             page_icon="avatars/favicon.ico",
                             layout="wide",
                             initial_sidebar_state='expanded')
         st.image("avatars/logo.svg", width=100)
-
 
         if is_login():
             page(page_title)

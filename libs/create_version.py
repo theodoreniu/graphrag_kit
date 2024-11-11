@@ -4,7 +4,7 @@ from pathlib import Path
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from libs.common import format_rag_version
+from libs.common import format_rag_version, run_command
 import libs.config as config
 from contextlib import redirect_stdout
 import asyncio
@@ -47,6 +47,9 @@ def create_version():
     if btn:
         formatted_rag_version = format_rag_version(new_rag_version)
         root = os.path.join("/app", "projects", formatted_rag_version)
+        
+        # run_command("graphrag init --root ./ragtest", True)
+        
         try:
             initialize_project(path=root)
             overwrite_settings_yaml(root, new_rag_version)

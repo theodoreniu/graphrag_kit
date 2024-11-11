@@ -5,6 +5,7 @@ import libs.config as config
 from code_editor import code_editor
 from streamlit_ace import st_ace
 
+
 def get_settings(rag_version: str):
     settings_file = f"/app/projects/{rag_version}/settings.yaml"
     if not os.path.exists(settings_file):
@@ -24,8 +25,8 @@ def set_settings(rag_version: str):
     new_settings = st_ace(settings,
                    theme="tomorrow_night",
                    language='yaml',
+                   height=400,
                           key=f"settings_{rag_version}")
-
 
     if st.button("Save", key=f"save_settings_{rag_version}"):
         with open(settings_file, 'w') as f:
