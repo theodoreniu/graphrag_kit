@@ -29,13 +29,7 @@ app.add_middleware(
 class Item(BaseModel):
     query: str
     rag_version: str
-    community_level: str
-
-
-# -----------------------------------------------------------------
-@app.get("/favicon.ico")
-def favicon():
-   return FileResponse(os.path.join("avatars", "favicon.ico"))
+    community_level: int
 
 
 # -----------------------------------------------------------------
@@ -48,7 +42,7 @@ def local_search(item: Item, api_key: str=Header(...)):
         # set_venvs(item.rag_version)
         
         (response, context_data) = run_local_search(
-                    root_dir=project_path(item.project_name),
+                    root_dir=project_path(item.rag_version),
                     query=improve_query(item.rag_version, item.query),
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
@@ -78,7 +72,7 @@ def global_search(item: Item, api_key: str=Header(...)):
         # set_venvs(item.rag_version)
 
         (response, context_data) = run_global_search(
-                    root_dir=project_path(item.project_name),
+                    root_dir=project_path(item.rag_version),
                     query=improve_query(item.rag_version, item.query),
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
@@ -107,7 +101,7 @@ def global_search(item: Item, api_key: str=Header(...)):
         # set_venvs(item.rag_version)
 
         (response, context_data) = run_drift_search(
-                    root_dir=project_path(item.project_name),
+                    root_dir=project_path(item.rag_version),
                     query=improve_query(item.rag_version, item.query),
                     community_level=int(item.community_level),
                     streaming=False,
