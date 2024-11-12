@@ -44,7 +44,7 @@ def generate_data(rag_version: str):
         run_command(f"rm -rf /app/projects/{rag_version}/input/*")
         time.sleep(3)
         st.success("All files deleted.")
-    if st.button("Clear cached files", key=f"delete_all_cached_files_{rag_version}"):
+    if st.button("Clear PDF cached files", key=f"delete_all_cached_files_{rag_version}"):
         run_command(f"rm -rf /app/projects/{rag_version}/pdf_cache/*")
         time.sleep(3)
         st.success("All files deleted.")

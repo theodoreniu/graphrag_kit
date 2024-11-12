@@ -74,7 +74,7 @@ class PageTask:
 
     
 def save_pdf_pages_as_images(pdf_path:str, rag_version:str, pdf_vision_option: str):
-    pdf_ai_txt_path = f"{pdf_path}.txt"
+    pdf_ai_txt_path = f"{pdf_path}.{pdf_vision_option.replace(" ", "")}.txt"
     base_dir = f"/app/projects/{rag_version}/pdf_cache"
     os.makedirs(base_dir, exist_ok=True)
 

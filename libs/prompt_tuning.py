@@ -9,6 +9,7 @@ import graphrag.api as api
 import libs.config as config
 from graphrag.config import load_config
 
+
 async def start(base_path:str):
 
     (
@@ -35,14 +36,19 @@ async def start(base_path:str):
 
     with open(entity_extraction_prompt_path, "wb") as file:
         file.write(entity_extraction_prompt.encode(encoding="utf-8", errors="strict"))
+        
     with open(entity_summarization_prompt_path, "wb") as file:
         file.write(entity_summarization_prompt.encode(encoding="utf-8", errors="strict"))
+        
     with open(community_summarization_prompt_path, "wb") as file:
         file.write(community_summarization_prompt.encode(encoding="utf-8", errors="strict"))
 
+
 def prompt_tuning(rag_version: str):
     base_path = f"/app/projects/{rag_version}"
-
+    
+    st.warning("This operation will overwrite your following files, please proceed with caution: \n\n - prompts/entity_extraction.txt \n\n - prompts/summarize_descriptions.txt \n\n - prompts/community_report.txt")
+    
     if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}"):
         with st.spinner("Running..."):
             asyncio.run(start(base_path))
