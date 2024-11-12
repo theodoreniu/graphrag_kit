@@ -5,10 +5,21 @@ import pandas as pd
 import streamlit as st
 import os
 import re
-
+import zipfile
+import os
+import streamlit as st
 from libs.common import run_command
 from libs.config import generate_data_vision, generate_data_vision_ocr, generate_data_vision_di
 from theodoretools.url import url_to_name
+
+
+def create_zip(directory, output_path):
+    with zipfile.ZipFile(output_path, 'w') as zipf:
+        for foldername, subfolders, filenames in os.walk(directory):
+            for filename in filenames:
+                if filename.endswith('.txt'):
+                    filepath = os.path.join(foldername, filename)
+                    zipf.write(filepath, os.path.relpath(filepath, directory))
 
 
 def generate_data(rag_version: str):
@@ -40,10 +51,23 @@ def generate_data(rag_version: str):
         st.success("Data generated successfully.")
 
     st.markdown(f"--------------")
+    if st.button("Download generated files", key=f"downloads_input_files_{rag_version}"):
+        directory_to_zip = f'/app/projects/{rag_version}/input'
+        output_zip_path = f'/tmp/{rag_version}.zip'
+        create_zip(directory_to_zip, output_zip_path)
+        with open(output_zip_path, "rb") as f:
+            st.download_button(
+                label="Download",
+                data=f,
+                file_name=f"{rag_version}.zip",
+                mime="application/zip"
+            )
+        
     if st.button("Clear generated files", key=f"delete_all_input_files_{rag_version}"):
         run_command(f"rm -rf /app/projects/{rag_version}/input/*")
         time.sleep(3)
         st.success("All files deleted.")
+
     if st.button("Clear PDF cached files", key=f"delete_all_cached_files_{rag_version}"):
         run_command(f"rm -rf /app/projects/{rag_version}/pdf_cache/*")
         time.sleep(3)
