@@ -27,3 +27,4 @@ azure-ai-formrecognizer==3.3.3
 streamlit_code_editor==0.1.21
 streamlit-ace==0.1.1
 pytest==8.3.3
+xlsxwriter==3.2.0
