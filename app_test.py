@@ -173,16 +173,17 @@ def page(title: str):
                         config_filepath=None,
                         data_dir=None,
                     )
-
-                    modified_df.at[index, "response"] = response
                     
                     st.info(f"Query: {row['query']}")
                     
                     score = "0"
+                    
                     if 'answer' in row:
                         st.warning(f"Answer: {row['answer']}")
                         score = response_score(improve_query_text, row['answer'], response)
-                        modified_df.at[index, "score"] = score
+                    
+                    modified_df.at[index, "response"] = response
+                    modified_df.at[index, "score"] = score
                         
                     st.success(f"GraphRAG ({score}%): {response}")
             
@@ -194,7 +195,7 @@ def page(title: str):
                 df.to_excel(writer, sheet_name=sheet_name, index=False)   
                 
         st.download_button(
-            label="answers",
+            label="Download Test Results",
             data=output.getvalue(),
             file_name="response_excel.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
