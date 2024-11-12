@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app_version = "0.0.2"
+app_version = "0.0.3"
 graphrag_version = "0.4.1"
 
 manage_tip = os.getenv('MANAGE_TIP', '')
