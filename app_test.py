@@ -133,6 +133,7 @@ def page(title: str):
     st.markdown("## Batch Test")
     
     st.markdown("Put the question in a field called `query`, When all queries are executed, you can download the file.")
+    st.markdown("If a column named `answer` is used as the standard answer, automated testing calculates answer score.")
     
     uploaded_file = st.file_uploader(
         label="upload",
