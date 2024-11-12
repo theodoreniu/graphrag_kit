@@ -21,13 +21,13 @@ async def start(base_path:str):
             root=base_path,
         )
 
-    st.markdown("## entity_extraction_prompt")
+    st.info("## entity_extraction_prompt\n\nprompts/entity_extraction.txt")
     st.text(entity_extraction_prompt)
 
-    st.markdown("## entity_summarization_prompt")
+    st.info("## entity_summarization_prompt\n\nprompts/summarize_descriptions.txt")
     st.text(entity_summarization_prompt)
 
-    st.markdown("## community_summarization_prompt")
+    st.info("## community_summarization_prompt\n\nprompts/community_report.txt")
     st.text(community_summarization_prompt)
 
     entity_extraction_prompt_path = f"{base_path}/prompts/entity_extraction.txt"
