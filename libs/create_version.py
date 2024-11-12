@@ -38,7 +38,6 @@ def overwrite_settings_yaml(root, new_rag_version):
 
 
 def create_version():
-    st.markdown("----------------------------")
     st.markdown("# New Project")
     today_hour = time.strftime("%Y%m%d%H", time.localtime())
 
