@@ -29,7 +29,7 @@ app.add_middleware(
 class Item(BaseModel):
     query: str
     rag_version: str
-    community_level: int
+    community_level: int = 2
 
 
 # -----------------------------------------------------------------

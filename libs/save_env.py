@@ -5,6 +5,7 @@ import libs.config as config
 from code_editor import code_editor
 from streamlit_ace import st_ace
 
+
 def get_envs():
     env_file = f"/app/.env"
     if not os.path.exists(env_file):
@@ -25,14 +26,12 @@ def set_envs():
         new_envs = st_ace(envs,
                           key=f"env_file",
                           theme="tomorrow_night",
-                          language='sh'
+                          language='sh',
+                          height=300,
+                          auto_update=True,
                           )
-
-        # new_settings = code_editor(envs, lang="yaml", key=f"settings_env")
-        # st.write(new_settings)
-
 
         if st.button("Save", key=f"save_env"):
             with open(env_file, 'w') as f:
                 f.write(new_envs)
-            st.success("ENV saved.")
+            st.success("ENV saved. You need to reboot for it to take effect.")
