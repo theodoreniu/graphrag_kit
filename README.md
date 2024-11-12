@@ -30,7 +30,13 @@ When the applications are started, you will have access to 3 URLs:
 - Test App: http://localhost:9001/
 - API Documentation: http://localhost:9002/docs
 
-## Make App as your Service
+## Update GraphRAG Kit
+
+```bash
+bash update.sh
+```
+
+## Make App as system Service
 
 If you want to make the app as your service, run:
 
@@ -38,7 +44,7 @@ If you want to make the app as your service, run:
 bash service.sh
 ```
 
-## Deploy
+## Deploy to production environment
 
 Before deploying the applications, run:
 
