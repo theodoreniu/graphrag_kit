@@ -9,7 +9,6 @@ import base64
 from dotenv import load_dotenv
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-
 from libs.common import get_original_dir, list_files_and_sizes, run_command
 from pathlib import Path
 from  libs.common import debug
@@ -24,7 +23,6 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 
-
 def list_uploaded_files(container, rag_version: str):
     files = list_files_and_sizes(get_original_dir(rag_version))
     if len(files) > 0:
@@ -33,17 +31,16 @@ def list_uploaded_files(container, rag_version: str):
         container.write(files)
 
 
-
 def upload_file(rag_version: str):
     
     file_list_container = st.empty()
 
     st.info(f"Tip: The same file name will be overwritten.")
     uploaded_files = st.file_uploader(
-        label="uplaod",
+        label="upload",
         type=[
             'pdf',
-              'txt', 
+              'txt',
               'xlsx',
                 'csv',
                 # 'jpeg',
@@ -75,6 +72,7 @@ def upload_file(rag_version: str):
         list_uploaded_files(file_list_container, rag_version)
         st.success('File uploaded successfully.')
 
+
 def deal_zip(uploaded_file: UploadedFile, session_id: str):
     extract_dir = f'/tmp/{session_id}/input/'
     if uploaded_file is not None:
@@ -93,7 +91,6 @@ def deal_zip(uploaded_file: UploadedFile, session_id: str):
                 deal_md(extract_dir, f)
 
 
-
 def deal_md(extract_dir, file_name):
     file_path = f"{extract_dir}{file_name}"
     with open(file_path, 'r') as file:
@@ -110,8 +107,6 @@ def deal_md(extract_dir, file_name):
             md_file.write(updated_md_content)
             with st.expander(f"{new_file} New"):
                 st.text(updated_md_content)
-
-
 
 
 def extract_images_from_md(md_content, extract_dir):
@@ -150,8 +145,6 @@ def extract_images_from_md(md_content, extract_dir):
             updated_md_content = updated_md_content.replace(match, image_path)
 
     return updated_md_content
-
-
 
 
 def get_image_description(client, encoded_string, image_extension, prompt, model_choice):
@@ -215,5 +208,4 @@ def rek_image(image_path: str):
                     st.error(f"Error: {e}")
 
     return ""
-
 

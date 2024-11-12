@@ -21,9 +21,12 @@ def build_index(project_name: str):
         if st.button('Start Build', key='build_index_' + project_name):
             with st.spinner("Building index..."):
                 progress_reporter = PrintProgressReporter("")
-
+                config = load_graphrag_config(project_name)
+                
+                st.json(config, expanded=False)
+                
                 asyncio.run(api.build_index(
-                        config=load_graphrag_config(project_name),
+                        config=config,
                         run_id="",
                         is_resume_run=False,
                         memory_profile=False,

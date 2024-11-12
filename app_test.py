@@ -1,16 +1,42 @@
 
 import streamlit as st
 from dotenv import load_dotenv
-
+import io
 from libs.common import get_rag_versions, project_path
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
-
+import pandas as pd
 from  libs.common import is_login
 import libs.config as config
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
+from openai import AzureOpenAI
 
 load_dotenv()
+
+client = AzureOpenAI(
+    api_version=config.search_azure_api_version,
+    azure_endpoint=config.search_azure_api_base,
+    azure_deployment=config.search_azure_chat_deployment_name,
+    api_key=config.search_azure_api_key,
+)
+
+
+def response_score(query:str, standard_answer:str, generated_answer:str):
+    completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": "你是一个答案评分助手，我给你问题、标准答案和AI生成的答案，请给你AI生成的答案评分，满分 100 分，最小分0分，分数需要是整数，你只需要给出分数即可。如果AI生成的答案与标准答案含义相同或者能包含标准答案的含义，则满分，否则分数递减。",
+            },
+            {
+                "role": "user",
+                "content": f"问题：{query} \n\n标准答案：{standard_answer} \n\nAI生成的答案：{generated_answer} \n\n",
+            }
+        ],
+        model=config.search_azure_chat_model_id,
+    )
+    ai_txt = completion.choices[0].message.content
+    return ai_txt
 
 
 def page(title: str):
@@ -103,6 +129,77 @@ def page(title: str):
                 with st.expander("Context"):
                     st.write(context_data)
 
+    st.markdown("-----------------")
+    st.markdown("## Batch Test")
+    
+    st.markdown("Put the question in a field called `query`, When all queries are executed, you can download the file.")
+    
+    uploaded_file = st.file_uploader(
+        label="upload",
+        type=['xlsx'],
+        accept_multiple_files=False,
+        label_visibility="hidden",
+        key=f"file_uploader_batch_test",
+    )
+    
+    if uploaded_file is not None:
+        excel_data = pd.ExcelFile(uploaded_file)
+        modified_sheets = {}
+
+        for sheet_name in excel_data.sheet_names:
+            st.write(f"### Sheet: {sheet_name}")
+            
+            sheet_df = excel_data.parse(sheet_name)
+            row_count = len(sheet_df)
+            
+            modified_df = sheet_df.copy()
+            
+            for index, row in sheet_df.iterrows():
+                if 'query' not in row:
+                    raise Exception("query must be in every row")
+
+                index_name = f"{index+1}/{row_count}"
+                st.markdown(f"## {index_name}")
+                with st.spinner(f'Generating ...'):
+                    
+                    improve_query_text = improve_query(project_name, row['query'])
+                    
+                    (response, context_data) = run_local_search(
+                        root_dir=project_path(project_name),
+                        query=improve_query_text,
+                        community_level=int(community_level),
+                        response_type="Multiple Paragraphs",
+                        streaming=False,
+                        config_filepath=None,
+                        data_dir=None,
+                    )
+
+                    modified_df.at[index, "response"] = response
+                    
+                    st.info(f"Query: {row['query']}")
+                    
+                    score = "0"
+                    if 'answer' in row:
+                        st.warning(f"Answer: {row['answer']}")
+                        score = response_score(improve_query_text, row['answer'], response)
+                        modified_df.at[index, "score"] = score
+                        
+                    st.success(f"GraphRAG ({score}%): {response}")
+            
+            modified_sheets[sheet_name] = modified_df
+        
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            for sheet_name, df in modified_sheets.items():
+                df.to_excel(writer, sheet_name=sheet_name, index=False)   
+                
+        st.download_button(
+            label="answers",
+            data=output.getvalue(),
+            file_name="response_excel.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        
     # if st.button('Candidate Questions', key="run_candidate_questions"):
     #     if not query:
     #         st.error("Please enter a query")
