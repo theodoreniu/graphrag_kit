@@ -2,6 +2,7 @@
 import streamlit as st
 from dotenv import load_dotenv
 import io
+from libs.save_settings import set_settings
 from libs.common import get_rag_versions, project_path, restart_component
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
@@ -62,10 +63,15 @@ def page(title: str):
 
     c1, c2 = st.columns([1, 1])
     with c1:
-        project_name = st.selectbox("Projects", rag_versions_list)
+        project_name = st.selectbox("Project", rag_versions_list)
     with c2:
         community_level = st.text_input("community_level", value=2)
+        
+    # project settings review
+    with st.expander("Project Settings Review"):
+        set_settings(project_name, read_only=True)
 
+    # query input
     query = st.text_area(label="search",
                          label_visibility='hidden',
                          max_chars=1000,

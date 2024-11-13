@@ -4,7 +4,7 @@ from pathlib import Path
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from libs.common import format_rag_version, run_command
+from libs.common import format_rag_version, get_rag_versions, run_command
 import libs.config as config
 from contextlib import redirect_stdout
 import asyncio
@@ -38,22 +38,45 @@ def overwrite_settings_yaml(root, new_rag_version):
 
 
 def create_version():
+    rag_versions_list = get_rag_versions()
     st.markdown("# New Project")
     today_hour = time.strftime("%Y%m%d%H", time.localtime())
-
-    new_rag_version = st.text_input("Please input name",
-                                    value=today_hour,
-                                    max_chars=30,
+    new_project_value = "Just New Project"
+    c1, c2 = st.columns(2)
+    with c1:
+        new_rag_version = st.text_input("Please input name",
+                                        value=today_hour,
+                                        max_chars=30,
                                     )
+    with c2:
+        rag_versions_list.insert(0, new_project_value)
+        copy_from_project_name = st.selectbox("Copy from", rag_versions_list, key="create_from_project_name")
+        
     btn = st.button("Confirm", key="confirm")
     if btn:
         formatted_rag_version = format_rag_version(new_rag_version)
+        
+        if check_project_exists(formatted_rag_version):
+            st.error(f"Project {formatted_rag_version} already exists.")
+            return
+        
         root = os.path.join("/app", "projects", formatted_rag_version)
         
-        # run_command("graphrag init --root ./ragtest", True)
-        
         try:
-            initialize_project(path=root)
-            overwrite_settings_yaml(root, new_rag_version)
+            if copy_from_project_name == new_project_value:
+                initialize_project(path=root)
+                overwrite_settings_yaml(root, formatted_rag_version)
+            else:
+                copy_project(copy_from_project_name, formatted_rag_version)
         except Exception as e:
             st.error(str(e))
+
+
+def check_project_exists(formatted_rag_version: str):
+    return os.path.exists(f"/app/projects/{formatted_rag_version}")
+
+
+def copy_project(copy_from_project_name: str, formatted_rag_version: str):
+    run_command(f"cp -r '/app/projects/{copy_from_project_name}' '/app/projects/{formatted_rag_version}'")
+    st.success(f"Project {copy_from_project_name} copied to {formatted_rag_version}")
+    time.sleep(3)
