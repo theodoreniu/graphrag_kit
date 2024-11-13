@@ -37,6 +37,19 @@ def overwrite_settings_yaml(root, new_rag_version):
             f.write(new_settings_yaml)
 
 
+def write_project_prompt(root):
+    os.makedirs(f"{root}/prompts/", exist_ok=True)
+    prompt_txt = f"{root}/prompts/prompt.txt"
+    template_prompt_txt = """-Your Role-
+You are an intelligent assistant.
+
+-User Query-
+{query}
+"""
+    with open(prompt_txt, "w") as f:
+        f.write(template_prompt_txt)
+
+
 def create_version():
     rag_versions_list = get_rag_versions()
     st.markdown("# New Project")
@@ -66,6 +79,7 @@ def create_version():
             if copy_from_project_name == new_project_value:
                 initialize_project(path=root)
                 overwrite_settings_yaml(root, formatted_rag_version)
+                write_project_prompt(root)
             else:
                 copy_project(copy_from_project_name, formatted_rag_version)
         except Exception as e:

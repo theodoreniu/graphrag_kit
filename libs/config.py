@@ -5,7 +5,7 @@ from datetime import datetime
 
 load_dotenv()
 
-app_version = "0.0.4"
+app_version = "0.0.5"
 graphrag_version = "0.4.1"
 app_started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 manage_tip = os.getenv('MANAGE_TIP', '')
