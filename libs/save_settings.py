@@ -1,8 +1,6 @@
-import pandas as pd
 import streamlit as st
 import os
-import libs.config as config
-from code_editor import code_editor
+from libs.set_prompt import check_prompt
 from streamlit_ace import st_ace
 
 
@@ -111,14 +109,37 @@ def summarize_descriptions(project_name: str, read_only: bool=False):
         st.success("Settings saved.")
 
 
+def project_prompt_setting(project_name: str, read_only: bool=False):
+    settings_file = f"/app/projects/{project_name}/prompts/prompt.txt"
+
+    settings = get_setting_file(settings_file)        
+    new_settings = st_ace(settings,
+                   theme="tomorrow_night",
+                   language='plain_text',
+                   height=400,
+                   auto_update=True,
+                   wrap=True,
+                   show_gutter=True,
+                   show_print_margin=True,
+                   key=f"project_prompt_{project_name}")
+    if read_only == False and st.button("Save", key=f"save_project_prompt_{project_name}"):
+        if not check_prompt(new_settings):
+            st.error("Prompt must contain {query}")
+            return
+        with open(settings_file, 'w') as f:
+            f.write(new_settings)
+            st.success("Settings saved.")
+
+
 def set_settings(project_name: str, read_only=False):
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "settings.yaml",
         "claim_extraction.txt",
         "community_report.txt",
         "entity_extraction.txt",
         "summarize_descriptions.txt",
+        "prompt.txt",
         ])
     with tab1:
         settings(project_name, read_only=read_only)
@@ -130,3 +151,5 @@ def set_settings(project_name: str, read_only=False):
         entity_extraction(project_name, read_only=read_only)
     with tab5:
         summarize_descriptions(project_name, read_only=read_only)
+    with tab6:
+        project_prompt_setting(project_name, read_only=read_only)

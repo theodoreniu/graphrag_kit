@@ -53,7 +53,7 @@ def page(title: str):
         st.error("No projects found.")
         return
 
-    st.markdown("### Generate Test")
+    st.markdown("### Select Project to Test")
 
     options = []
     if not config.disable_pgvector:
@@ -70,7 +70,12 @@ def page(title: str):
     # project settings review
     with st.expander("Project Settings Review"):
         set_settings(project_name, read_only=True)
-
+    
+    st.text("\n")
+    st.text("\n")
+    st.text("\n")
+    st.markdown("### Single Test")
+    
     # query input
     query = st.text_area(label="search",
                          label_visibility='hidden',
@@ -81,7 +86,7 @@ def page(title: str):
     st.markdown("Local Search: https://microsoft.github.io/graphrag/query/local_search/")
     st.markdown("Global Search: https://microsoft.github.io/graphrag/query/global_search/")
     st.markdown("DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
-            
+    
     if st.button('Local Search', key="local_search"):
         if not query:
             st.error("Please enter a query")
@@ -190,7 +195,9 @@ def page(title: str):
                     if 'answer' in row:
                         st.warning(f"Answer: {row['answer']}")
                         score = response_score(improve_query_text, row['answer'], response)
-                    
+   
+                    modified_df.at[index, "project_name"] = project_name
+                    modified_df.at[index, "community_level"] = community_level
                     modified_df.at[index, "response"] = response
                     modified_df.at[index, "score"] = score
                         
@@ -202,11 +209,12 @@ def page(title: str):
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             for sheet_name, df in modified_sheets.items():
                 df.to_excel(writer, sheet_name=sheet_name, index=False)   
-                
+        
+        st.markdown("## Download Test Results")
         st.download_button(
             label="Download Test Results",
             data=output.getvalue(),
-            file_name="response_excel.xlsx",
+            file_name=uploaded_file.name.replace(".xlsx", "_graphrag_test.xlsx"),
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
         
