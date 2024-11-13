@@ -11,7 +11,7 @@ app_started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 manage_tip = os.getenv('MANAGE_TIP', '')
 app_name = os.getenv('APP_NAME', 'rag')
 test_tip = os.getenv('TEST_TIP', '')
-app_password = os.getenv('APP_PASSWORD')
+app_password = os.getenv('APP_PASSWORD', '')
 
 is_debug = os.getenv('DEBUG_MODE') == 'true'
 api_key = os.getenv('API_KEY', 'api_key')
