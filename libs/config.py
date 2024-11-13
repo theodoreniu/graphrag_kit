@@ -1,12 +1,13 @@
 import os
 import time
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
 app_version = "0.0.4"
 graphrag_version = "0.4.1"
-
+app_started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 manage_tip = os.getenv('MANAGE_TIP', '')
 app_name = os.getenv('APP_NAME', 'rag')
 test_tip = os.getenv('TEST_TIP', '')

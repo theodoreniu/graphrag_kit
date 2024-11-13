@@ -2,7 +2,7 @@
 import streamlit as st
 from dotenv import load_dotenv
 import io
-from libs.common import get_rag_versions, project_path
+from libs.common import get_rag_versions, project_path, restart_component
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
 import pandas as pd
@@ -44,12 +44,14 @@ def page(title: str):
     st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}`")
     if config.test_tip:
         st.write(config.test_tip)
+        
+    restart_component()
+    
     rag_versions_list = get_rag_versions()
     if len(rag_versions_list) == 0:
         st.error("No projects found.")
         return
-    
-    st.markdown("------------------------")
+
     st.markdown("### Generate Test")
 
     options = []
@@ -73,7 +75,6 @@ def page(title: str):
     st.markdown("Local Search: https://microsoft.github.io/graphrag/query/local_search/")
     st.markdown("Global Search: https://microsoft.github.io/graphrag/query/global_search/")
     st.markdown("DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
-    st.markdown("------------------------")
             
     if st.button('Local Search', key="local_search"):
         if not query:

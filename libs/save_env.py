@@ -34,4 +34,4 @@ def set_envs():
         if st.button("Save", key=f"save_env"):
             with open(env_file, 'w') as f:
                 f.write(new_envs)
-            st.success("ENV saved. You need to reboot for it to take effect.")
+            st.success("ENV saved. You need to restart app for it to take effect.")

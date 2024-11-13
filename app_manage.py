@@ -5,7 +5,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from libs.save_env import set_envs
-from  libs.common import is_login
+from  libs.common import is_login, restart_component
 import libs.config as config
 from libs.create_version import create_version
 from libs.versions_manage import versions_manage
@@ -30,6 +30,8 @@ def page(title: str):
     if config.manage_tip:
         st.write(config.manage_tip)
 
+    restart_component()
+    
     set_envs()
 
     create_version()
