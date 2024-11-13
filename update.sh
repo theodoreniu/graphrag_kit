@@ -7,4 +7,4 @@ git pull origin main
 
 sudo chmod 666 /var/run/docker.sock
 docker-compose build
-docker-compose down
+docker-compose down --rm all || true
