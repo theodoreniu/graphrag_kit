@@ -8,6 +8,8 @@ from graphrag.config import (
     load_config,
 )
 from pathlib import Path
+import sys
+import signal
 
 
 def project_path(project_name: str):
@@ -127,3 +129,14 @@ def run_command(command: str, output: bool=False):
     rc = process.poll()
     return rc
 
+
+def restart_component():
+    with st.expander("App Server"):
+        st.write(f"App started at: `{config.app_started_at}`")
+        if st.button("Restart"):
+            st.success("You need to refresh page later.")
+            os._exit(1)
+            sys.exit(1)
+            os.kill(os.getpid(), signal.SIGTERM)
+            st.stop()
+            sys.exit()
