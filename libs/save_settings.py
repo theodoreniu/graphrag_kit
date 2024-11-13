@@ -15,7 +15,7 @@ def get_setting_file(file_path: str):
         return prompt
 
 
-def settings(project_name: str):
+def settings(project_name: str, read_only: bool=False):
     settings_file = f"/app/projects/{project_name}/settings.yaml"
 
     settings = get_setting_file(settings_file)        
@@ -28,13 +28,14 @@ def settings(project_name: str):
                    show_gutter=True,
                    show_print_margin=True,
                    key=f"settings_{project_name}")
-    if st.button("Save", key=f"save_settings_{project_name}"):
+    
+    if read_only == False and st.button("Save", key=f"save_settings_{project_name}"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
-        st.success("Settings saved.")
+            st.success("Settings saved.")
 
 
-def claim_extraction(project_name: str):
+def claim_extraction(project_name: str, read_only: bool=False):
     settings_file = f"/app/projects/{project_name}/prompts/claim_extraction.txt"
 
     settings = get_setting_file(settings_file)        
@@ -47,13 +48,13 @@ def claim_extraction(project_name: str):
                    show_gutter=True,
                    show_print_margin=True,
                    key=f"claim_extraction_{project_name}")
-    if st.button("Save", key=f"save_claim_extraction_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_claim_extraction_{project_name}"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
 
 
-def community_report(project_name: str):
+def community_report(project_name: str, read_only: bool=False):
     settings_file = f"/app/projects/{project_name}/prompts/community_report.txt"
 
     settings = get_setting_file(settings_file)        
@@ -66,13 +67,13 @@ def community_report(project_name: str):
                    show_gutter=True,
                    show_print_margin=True,
                    key=f"community_report_{project_name}")
-    if st.button("Save", key=f"save_community_report_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_community_report_{project_name}"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
 
 
-def entity_extraction(project_name: str):
+def entity_extraction(project_name: str, read_only: bool=False):
     settings_file = f"/app/projects/{project_name}/prompts/entity_extraction.txt"
 
     settings = get_setting_file(settings_file)        
@@ -85,13 +86,13 @@ def entity_extraction(project_name: str):
                    show_gutter=True,
                    show_print_margin=True,
                    key=f"entity_extraction_{project_name}")
-    if st.button("Save", key=f"save_entity_extraction_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_entity_extraction_{project_name}"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
 
 
-def summarize_descriptions(project_name: str):
+def summarize_descriptions(project_name: str, read_only: bool=False):
     settings_file = f"/app/projects/{project_name}/prompts/summarize_descriptions.txt"
 
     settings = get_setting_file(settings_file)        
@@ -104,13 +105,13 @@ def summarize_descriptions(project_name: str):
                    show_gutter=True,
                    show_print_margin=True,
                    key=f"summarize_descriptions_{project_name}")
-    if st.button("Save", key=f"save_summarize_descriptions_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_summarize_descriptions_{project_name}"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
 
 
-def set_settings(project_name: str):
+def set_settings(project_name: str, read_only=False):
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "settings.yaml",
@@ -120,12 +121,12 @@ def set_settings(project_name: str):
         "summarize_descriptions.txt",
         ])
     with tab1:
-        settings(project_name)
+        settings(project_name, read_only=read_only)
     with tab2:
-        claim_extraction(project_name)
+        claim_extraction(project_name, read_only=read_only)
     with tab3:
-        community_report(project_name)
+        community_report(project_name, read_only=read_only)
     with tab4:
-        entity_extraction(project_name)
+        entity_extraction(project_name, read_only=read_only)
     with tab5:
-        summarize_descriptions(project_name)
+        summarize_descriptions(project_name, read_only=read_only)

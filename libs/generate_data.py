@@ -24,10 +24,11 @@ def create_zip(directory, output_path):
 
 def generate_data(rag_version: str):
     st.markdown(f"## Attention")
-    st.markdown(f"- Do not process txt files")
-    st.markdown(f"- PDF will be converted to txt")
-    st.markdown(f"- xlsx/csv will be converted to txt")
-    st.markdown(f"- If xlsx/csv contains a `doc_url` column, the relevant files will be automatically downloaded, and xlsx/csv itself will be excluded")
+    st.markdown(f"- Do not process `txt` files")
+    st.markdown(f"- `pdf` will be converted to `txt`")
+    st.markdown(f"- `xlsx/csv` will be converted to `txt`")
+    st.markdown(f"- `md` will be converted to `txt`")
+    st.markdown(f"- If `xlsx/csv` contains a `doc_url` column, the relevant files will be automatically downloaded, and `xlsx/csv` itself will be excluded")
     
     st.markdown(f"--------------")
     options = [
@@ -102,20 +103,23 @@ def excel_to_txt(file_path, rag_version):
 
 
 def prepare_file(file_path, file, rag_version):
-        if file.endswith('.xlsx') or file.endswith('.csv'):
-            if has_download_files(file_path):
-                download_files_from_xlsx_csv(file_path, file, rag_version)
-            else:
-                run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
-
-        if file.endswith('.txt'):
+    if file.endswith('.xlsx') or file.endswith('.csv'):
+        if has_download_files(file_path):
+            download_files_from_xlsx_csv(file_path, file, rag_version)
+        else:
             run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
-        if file.endswith('.pdf'):
-            run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
+    if file.endswith('.txt'):
+        run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
 
-        # if file.endswith('.zip'):
-        #     deal_zip(file_path, rag_version)
+    if file.endswith('.md'):
+        run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/{file}.txt")
+
+    if file.endswith('.pdf'):
+        run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
+
+    # if file.endswith('.zip'):
+    #     deal_zip(file_path, rag_version)
 
 
 def has_download_files(file_path: str):

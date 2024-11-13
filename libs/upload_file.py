@@ -43,6 +43,7 @@ def upload_file(rag_version: str):
               'txt',
               'xlsx',
                 'csv',
+                'md',
                 # 'jpeg',
                 # 'jpg',
                 # 'png',

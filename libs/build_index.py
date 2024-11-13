@@ -5,12 +5,10 @@ import time
 import streamlit as st
 from graphrag.index.emit.types import TableEmitterType
 from libs.common import run_command, load_graphrag_config
-import libs.config as config
 import graphrag.api as api
 import asyncio
 import time
 import streamlit as st
-import libs.config as config
 import asyncio
 
 from libs.progress import PrintProgressReporter
@@ -38,5 +36,10 @@ def build_index(project_name: str):
 
     if st.button("Clear index files", key="clear_index_" + project_name):
         run_command(f"rm -rf /app/projects/{project_name}/output/*")
-        time.sleep(3)
         st.success("All files deleted.")
+        time.sleep(3)
+
+    if st.button("Clear index cache files", key="clear_index_cache_" + project_name):
+        run_command(f"rm -rf /app/projects/{project_name}/cache/*")
+        st.success("All cache files deleted.")
+        time.sleep(3)
