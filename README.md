@@ -1,5 +1,7 @@
 # GraphRAG Kit
 
+A web interface for [GraphRAG](https://github.com/microsoft/graphrag).
+
 ## Requirements
 
 - Ubuntu 24
