@@ -101,7 +101,7 @@ def page(title: str):
                     config_filepath=None,
                     data_dir=None,
                 )
-                st.write(response)
+                st.success(response)
                 with st.expander("Context"):
                     st.write(context_data)
 
@@ -119,7 +119,7 @@ def page(title: str):
                     config_filepath=None,
                     data_dir=None,
                 )
-                st.write(response)
+                st.success(response)
                 with st.expander("Context"):
                     st.write(context_data)
 
@@ -137,7 +137,7 @@ def page(title: str):
                     config_filepath=None,
                     data_dir=None,
                 )
-                st.write(response)
+                st.success(response)
                 with st.expander("Context"):
                     st.write(context_data)
 
