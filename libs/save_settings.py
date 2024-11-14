@@ -139,8 +139,8 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
 
 def set_settings(project_name: str, read_only=False):
     tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-        "📁 Input",
         "📄 settings.yaml",
+        "📁 Input",
         "📄 claim_extraction.txt",
         "📄 community_report.txt",
         "📄 entity_extraction.txt",
@@ -148,9 +148,9 @@ def set_settings(project_name: str, read_only=False):
         "📄 prompt.txt",
         ])
     with tab1:
-        input_files(project_name)
-    with tab2:
         settings(project_name, read_only=read_only)
+    with tab2:
+        input_files(project_name)
     with tab3:
         claim_extraction(project_name, read_only=read_only)
     with tab4:
