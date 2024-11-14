@@ -138,8 +138,9 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
 
 
 def set_settings(project_name: str, read_only=False):
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📄 settings.yaml",
+        "📁 Input",
         "📄 claim_extraction.txt",
         "📄 community_report.txt",
         "📄 entity_extraction.txt",
@@ -149,12 +150,22 @@ def set_settings(project_name: str, read_only=False):
     with tab1:
         settings(project_name, read_only=read_only)
     with tab2:
-        claim_extraction(project_name, read_only=read_only)
+        input_files(project_name)
     with tab3:
-        community_report(project_name, read_only=read_only)
+        claim_extraction(project_name, read_only=read_only)
     with tab4:
-        entity_extraction(project_name, read_only=read_only)
+        community_report(project_name, read_only=read_only)
     with tab5:
-        summarize_descriptions(project_name, read_only=read_only)
+        entity_extraction(project_name, read_only=read_only)
     with tab6:
+        summarize_descriptions(project_name, read_only=read_only)
+    with tab7:
         project_prompt_setting(project_name, read_only=read_only)
+
+
+def input_files(project_name: str):
+    files_path = f"/app/projects/{project_name}/input"
+    if not os.path.exists(files_path):
+        os.makedirs(files_path)
+    files = os.listdir(files_path)
+    st.write(files)

@@ -50,6 +50,7 @@ di_key = os.getenv('DOCUMENT_INTELLIGENCE_KEY', '')
 disable_pgvector = os.getenv('DISABLE_PGVECTOR', False)
 disable_aisearch = os.getenv('DISABLE_AI_SEARCH', False)
 
-generate_data_vision = 'GPT Vision (as text)'
-generate_data_vision_ocr = 'GPT Vision (as image)'
+generate_data_vision = 'GPT Vision'
+generate_data_vision_txt = 'GPT Vision (as text)'
+generate_data_vision_image = 'GPT Vision (as image)'
 generate_data_vision_di = 'Azure AI Document Intelligence (as image)'

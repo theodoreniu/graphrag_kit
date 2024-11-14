@@ -1,4 +1,5 @@
 import time
+import numpy as np
 import requests
 
 import pandas as pd
@@ -8,9 +9,11 @@ import re
 import zipfile
 import os
 import streamlit as st
+from libs import config
 from libs.common import run_command
-from libs.config import generate_data_vision, generate_data_vision_ocr, generate_data_vision_di
+from libs.config import generate_data_vision, generate_data_vision_txt, generate_data_vision_image, generate_data_vision_di
 from theodoretools.url import url_to_name
+import libs.pdf_txt as pdf_txt
 
 
 def create_zip(directory, output_path):
@@ -33,7 +36,8 @@ def generate_data(rag_version: str):
     st.markdown(f"--------------")
     options = [
         generate_data_vision,
-        generate_data_vision_ocr,
+        generate_data_vision_txt,
+        generate_data_vision_image,
         generate_data_vision_di
         ]
     pdf_vision_option = st.radio('Please select a method to process the PDF:',
@@ -41,17 +45,28 @@ def generate_data(rag_version: str):
                                  options=options)
 
     if st.button('Start Generate' , key=f"generate_btn_{rag_version}", icon="🚀"):
-        for root, dirs, files in os.walk(f"/app/projects/{rag_version}/original"):
-            for file in files:
-                file_path = os.path.join(root, file)
-                prepare_file(file_path, file, rag_version)
-        for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
-            for file in files:
-                file_path = os.path.join(root, file)
-                convert_file(file_path, file, rag_version, pdf_vision_option)
-        st.success("Data generated successfully.")
+        with st.container(border=True, key=f"generate_container_{rag_version}", height=400):
+            with st.spinner(f"Processing ..."):
+                # print data model config
+                st.write(f"data_azure_api_base: `{config.data_azure_api_base}`")
+                st.write(f"data_azure_api_version: `{config.data_azure_api_version}`")
+                st.write(f"data_azure_chat_deployment_name: `{config.data_azure_chat_deployment_name}`")
+                st.write(f"data_azure_chat_model_id: `{config.data_azure_chat_model_id}`")
+            
+                # 1. copy original files to input
+                for root, dirs, files in os.walk(f"/app/projects/{rag_version}/original"):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        prepare_file(file_path, file, rag_version)
+                
+                # 2. convert files to txt
+                for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        convert_file(file_path, file, rag_version, pdf_vision_option)
 
-    st.markdown(f"--------------")
+                st.success("Data generated successfully.")
+
     if st.button("Download generated files", key=f"downloads_input_files_{rag_version}", icon="💾"):
         directory_to_zip = f'/app/projects/{rag_version}/input'
         output_zip_path = f'/tmp/{rag_version}.zip'
@@ -78,12 +93,12 @@ def generate_data(rag_version: str):
 def convert_file(file_path, file, rag_version, pdf_vision_option):
     
     if file.endswith('.xlsx') or file.endswith('.csv'):
-        st.write(f"converting {file}")
+        st.write(f"converting `{file}`")
         excel_to_txt(file_path, rag_version)
 
     if file.endswith('.pdf'):
-        st.write(f"converting {file}")
-        pdf_to_txt(file_path, rag_version, pdf_vision_option)
+        st.write(f"converting `{file}`")
+        pdf_txt.save_pdf_pages_as_images(file_path, rag_version, pdf_vision_option)
     
 
 def excel_to_txt(file_path, rag_version):
@@ -173,16 +188,6 @@ def download_file(doc_url, index, df_count, rag_version):
         st.write(f"[{index}/{df_count}] Downloaded: {file_path}")
     except requests.RequestException as e:
         st.write(f"[{index}/{df_count}] Downloaded Error: {e}")
-
-
-def pdf_to_txt(pdf_path:str, rag_version:str, pdf_vision_option):
-    import libs.pdf_txt as pdf_txt
-
-    try:
-        pdf_txt.save_pdf_pages_as_images(pdf_path, rag_version, pdf_vision_option)
-        st.write(f"PDF to txt {pdf_path}")
-    except Exception as e:
-        st.error(f"PDF to txt error: {pdf_path} \n {e}")
 
 
 def replace_image_tag(match):
