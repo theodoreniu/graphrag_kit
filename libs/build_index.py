@@ -41,7 +41,7 @@ def build_index(project_name: str):
         st.success("All files deleted.")
         time.sleep(3)
 
-    if st.button("Clear index cache files", key="clear_index_cache_" + project_name, icon="🗑️"):
-        run_command(f"rm -rf /app/projects/{project_name}/cache/*")
-        st.success("All cache files deleted.")
-        time.sleep(3)
+    # if st.button("Clear index cache files", key="clear_index_cache_" + project_name, icon="🗑️"):
+    #     run_command(f"rm -rf /app/projects/{project_name}/cache/*")
+    #     st.success("All cache files deleted.")
+    #     time.sleep(3)

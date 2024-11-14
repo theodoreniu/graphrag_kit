@@ -108,12 +108,14 @@ def prepare_file(file_path, file, rag_version):
             download_files_from_xlsx_csv(file_path, file, rag_version)
         else:
             run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
-
+            st.write(f"copied {file} to input")
     if file.endswith('.txt'):
         run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
+        st.write(f"copied {file} to input")
 
     if file.endswith('.md'):
         run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/{file}.txt")
+        st.write(f"converted {file} to {file}.txt")
 
     if file.endswith('.pdf'):
         run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
