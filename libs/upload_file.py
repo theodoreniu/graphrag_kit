@@ -27,7 +27,7 @@ def list_uploaded_files(container, rag_version: str):
     files = list_files_and_sizes(get_original_dir(rag_version))
     if len(files) > 0:
         container = container.container(border=True)
-        container.write(f"Files uploaded:")
+        container.write(f"{len(files)} Files uploaded:")
         container.write(files)
 
 
