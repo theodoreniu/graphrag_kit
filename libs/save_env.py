@@ -31,7 +31,7 @@ def set_envs():
                           auto_update=True,
                           )
 
-        if st.button("Save", key=f"save_env"):
+        if st.button("Save", key=f"save_env", icon="💾"):
             with open(env_file, 'w') as f:
                 f.write(new_envs)
             st.success("ENV saved. You need to restart app for it to take effect.")

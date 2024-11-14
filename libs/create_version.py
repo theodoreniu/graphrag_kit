@@ -65,7 +65,7 @@ def create_version():
         rag_versions_list.insert(0, new_project_value)
         copy_from_project_name = st.selectbox("Copy from", rag_versions_list, key="create_from_project_name")
         
-    btn = st.button("Confirm", key="confirm")
+    btn = st.button("Create", key="confirm", icon="🚀")
     if btn:
         formatted_rag_version = format_rag_version(new_rag_version)
         

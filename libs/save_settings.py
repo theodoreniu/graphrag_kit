@@ -24,10 +24,11 @@ def settings(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
+                   readonly=read_only,
                    show_print_margin=True,
                    key=f"settings_{project_name}")
     
-    if read_only == False and st.button("Save", key=f"save_settings_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_settings_{project_name}", icon="💾"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
             st.success("Settings saved.")
@@ -44,9 +45,10 @@ def claim_extraction(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
+                   readonly=read_only,
                    show_print_margin=True,
                    key=f"claim_extraction_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_claim_extraction_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_claim_extraction_{project_name}", icon="💾"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
@@ -63,9 +65,10 @@ def community_report(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
+                   readonly=read_only,
                    show_print_margin=True,
                    key=f"community_report_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_community_report_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_community_report_{project_name}", icon="💾"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
@@ -82,9 +85,10 @@ def entity_extraction(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
+                   readonly=read_only,
                    show_print_margin=True,
                    key=f"entity_extraction_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_entity_extraction_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_entity_extraction_{project_name}", icon="💾"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
@@ -101,9 +105,10 @@ def summarize_descriptions(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
+                   readonly=read_only,
                    show_print_margin=True,
                    key=f"summarize_descriptions_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_summarize_descriptions_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_summarize_descriptions_{project_name}", icon="💾"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
         st.success("Settings saved.")
@@ -120,9 +125,10 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
+                   readonly=read_only,
                    show_print_margin=True,
                    key=f"project_prompt_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_project_prompt_{project_name}"):
+    if read_only == False and st.button("Save", key=f"save_project_prompt_{project_name}", icon="💾"):
         if not check_prompt(new_settings):
             st.error("Prompt must contain {query}")
             return
@@ -132,14 +138,13 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
 
 
 def set_settings(project_name: str, read_only=False):
-
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "settings.yaml",
-        "claim_extraction.txt",
-        "community_report.txt",
-        "entity_extraction.txt",
-        "summarize_descriptions.txt",
-        "prompt.txt",
+        "📄 settings.yaml",
+        "📄 claim_extraction.txt",
+        "📄 community_report.txt",
+        "📄 entity_extraction.txt",
+        "📄 summarize_descriptions.txt",
+        "📄 prompt.txt",
         ])
     with tab1:
         settings(project_name, read_only=read_only)
