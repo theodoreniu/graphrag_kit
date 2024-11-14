@@ -139,7 +139,7 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
 
 def set_settings(project_name: str, read_only=False):
     tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-        "📁 Input Files",
+        "📁 Input",
         "📄 settings.yaml",
         "📄 claim_extraction.txt",
         "📄 community_report.txt",
@@ -165,5 +165,7 @@ def set_settings(project_name: str, read_only=False):
 
 def input_files(project_name: str):
     files_path = f"/app/projects/{project_name}/input"
+    if not os.path.exists(files_path):
+        os.makedirs(files_path)
     files = os.listdir(files_path)
     st.write(files)
