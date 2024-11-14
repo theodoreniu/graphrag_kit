@@ -6,7 +6,7 @@ import libs.config as config
 
 
 def index_preview(rag_version: str):
-    if st.button('Preview Index', key=f"index_preview_{rag_version}"):
+    if st.button('Preview Index', key=f"index_preview_{rag_version}", icon="🔍"):
     
         # check_rag_complete(rag_version)
         artifacts_path = f"/app/projects/{rag_version}/output"

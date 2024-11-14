@@ -52,7 +52,7 @@ if __name__ == "__main__":
             page(page_title)
         else:
             pass_input = st.text_input("Please input password", type="password")
-            pass_btn = st.button("Summit")
+            pass_btn = st.button("Login", icon="🔑")
             if pass_btn:
                 if pass_input != config.app_password:
                     st.error("Password error")

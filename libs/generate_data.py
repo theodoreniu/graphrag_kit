@@ -40,7 +40,7 @@ def generate_data(rag_version: str):
                                  key=f"db_{rag_version}",
                                  options=options)
 
-    if st.button('Start Generate' , key=f"generate_btn_{rag_version}"):
+    if st.button('Start Generate' , key=f"generate_btn_{rag_version}", icon="🚀"):
         for root, dirs, files in os.walk(f"/app/projects/{rag_version}/original"):
             for file in files:
                 file_path = os.path.join(root, file)
@@ -52,7 +52,7 @@ def generate_data(rag_version: str):
         st.success("Data generated successfully.")
 
     st.markdown(f"--------------")
-    if st.button("Download generated files", key=f"downloads_input_files_{rag_version}"):
+    if st.button("Download generated files", key=f"downloads_input_files_{rag_version}", icon="💾"):
         directory_to_zip = f'/app/projects/{rag_version}/input'
         output_zip_path = f'/tmp/{rag_version}.zip'
         create_zip(directory_to_zip, output_zip_path)
@@ -64,12 +64,12 @@ def generate_data(rag_version: str):
                 mime="application/zip"
             )
         
-    if st.button("Clear generated files", key=f"delete_all_input_files_{rag_version}"):
+    if st.button("Clear generated files", key=f"delete_all_input_files_{rag_version}", icon="🗑️"):
         run_command(f"rm -rf /app/projects/{rag_version}/input/*")
         time.sleep(3)
         st.success("All files deleted.")
 
-    if st.button("Clear PDF cached files", key=f"delete_all_cached_files_{rag_version}"):
+    if st.button("Clear PDF cached files", key=f"delete_all_cached_files_{rag_version}", icon="🗑️"):
         run_command(f"rm -rf /app/projects/{rag_version}/pdf_cache/*")
         time.sleep(3)
         st.success("All files deleted.")

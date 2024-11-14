@@ -68,7 +68,7 @@ def page(title: str):
         community_level = st.text_input("community_level", value=2)
         
     # project settings review
-    with st.expander("Project Settings Review"):
+    with st.expander("🔧 Project Settings Review"):
         set_settings(project_name, read_only=True)
     
     st.text("\n")
@@ -83,63 +83,64 @@ def page(title: str):
                          placeholder="Input your query here",
                          value="")
     
-    st.markdown("Local Search: https://microsoft.github.io/graphrag/query/local_search/")
-    st.markdown("Global Search: https://microsoft.github.io/graphrag/query/global_search/")
-    st.markdown("DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
-    
-    if st.button('Local Search', key="local_search"):
-        if not query:
-            st.error("Please enter a query")
-        else:
-            with st.spinner('Generating ...'):
-                (response, context_data) = run_local_search(
-                    root_dir=project_path(project_name),
-                    query=improve_query(project_name, query),
-                    community_level=int(community_level),
-                    response_type="Multiple Paragraphs",
-                    streaming=False,
-                    config_filepath=None,
-                    data_dir=None,
-                )
-                st.success(response)
-                with st.expander("Context"):
-                    st.write(context_data)
-
-    if st.button('Global Search', key="global_search"):
-        if not query:
-            st.error("Please enter a query")
-        else:
-            with st.spinner('Generating ...'):
-                (response, context_data) = run_global_search(
-                    root_dir=project_path(project_name),
-                    query=improve_query(project_name, query),
-                    community_level=int(community_level),
-                    response_type="Multiple Paragraphs",
-                    streaming=False,
-                    config_filepath=None,
-                    data_dir=None,
-                )
-                st.success(response)
-                with st.expander("Context"):
-                    st.write(context_data)
-
-    if st.button('Drift Search', key="run_drift_search"):
-        if not query:
-            st.error("Please enter a query")
-            return
-        else:
-            with st.spinner('Generating ...'):
-                (response, context_data) = run_drift_search(
-                    root_dir=project_path(project_name),
-                    query=improve_query(project_name, query),
-                    community_level=int(community_level),
-                    streaming=False,
-                    config_filepath=None,
-                    data_dir=None,
-                )
-                st.success(response)
-                with st.expander("Context"):
-                    st.write(context_data)
+    tab1, tab2, tab3 = st.tabs(["Local Search", "Global Search", "Drift Search"])
+    with tab1:
+        if st.button('🔎 Local Search', key="local_search"):
+            if not query:
+                st.error("Please enter a query")
+            else:
+                with st.spinner('Generating ...'):
+                    (response, context_data) = run_local_search(
+                        root_dir=project_path(project_name),
+                        query=improve_query(project_name, query),
+                        community_level=int(community_level),
+                        response_type="Multiple Paragraphs",
+                        streaming=False,
+                        config_filepath=None,
+                        data_dir=None,
+                    )
+                    st.success(response)
+                    with st.expander("Context"):
+                        st.write(context_data)
+        st.markdown("About Local Search: https://microsoft.github.io/graphrag/query/local_search/")
+    with tab2:
+        if st.button('🔎 Global Search', key="global_search"):
+            if not query:
+                st.error("Please enter a query")
+            else:
+                with st.spinner('Generating ...'):
+                    (response, context_data) = run_global_search(
+                        root_dir=project_path(project_name),
+                        query=improve_query(project_name, query),
+                        community_level=int(community_level),
+                        response_type="Multiple Paragraphs",
+                        streaming=False,
+                        config_filepath=None,
+                        data_dir=None,
+                    )
+                    st.success(response)
+                    with st.expander("Context"):
+                        st.write(context_data)
+        st.markdown("About Global Search: https://microsoft.github.io/graphrag/query/global_search/")
+    with tab3:
+        if st.button('🔎 Drift Search', key="run_drift_search"):
+            if not query:
+                st.error("Please enter a query")
+                return
+            else:
+                with st.spinner('Generating ...'):
+                    (response, context_data) = run_drift_search(
+                        root_dir=project_path(project_name),
+                        query=improve_query(project_name, query),
+                        community_level=int(community_level),
+                        streaming=False,
+                        config_filepath=None,
+                        data_dir=None,
+                    )
+                    st.success(response)
+                    with st.expander("Context"):
+                        st.write(context_data)
+        st.markdown("About DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
 
     st.markdown("-----------------")
     st.markdown("## Batch Test")
@@ -246,7 +247,7 @@ if __name__ == "__main__":
             page(page_title)
         else:
             pass_input = st.text_input("Please input password", type="password")
-            pass_btn = st.button("Summit")
+            pass_btn = st.button("Summit", icon="🔑")
             if pass_btn:
                 if pass_input != config.app_password:
                     st.error("Password error")

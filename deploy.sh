@@ -32,13 +32,13 @@ echo "memory: $APP_MEMORY"
 
 # if min-replicas is not set, use default 1
 if [ -z "$MIN_REPLICAS" ]; then
-  MIN_REPLICAS="1"
+  MIN_REPLICAS="0"
 fi
 echo "min-replicas: $MIN_REPLICAS"
 
 # if max-replicas is not set, use default 3
 if [ -z "$MAX_REPLICAS" ]; then
-  MAX_REPLICAS="3"
+  MAX_REPLICAS="4"
 fi
 echo "max-replicas: $MAX_REPLICAS"
 

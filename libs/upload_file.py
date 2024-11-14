@@ -53,7 +53,7 @@ def upload_file(rag_version: str):
         key=f"file_uploader_{rag_version}",
     )
     
-    if st.button("Delete all files", key=f"delete_all_files_{rag_version}"):
+    if st.button("Delete all files", key=f"delete_all_files_{rag_version}", icon="🗑️"):
         run_command(f"rm -rf /app/projects/{rag_version}/original/*")
         time.sleep(3)
         st.success("All files deleted.")

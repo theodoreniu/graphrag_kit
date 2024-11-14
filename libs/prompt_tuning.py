@@ -49,6 +49,6 @@ def prompt_tuning(rag_version: str):
     
     st.warning("This operation will overwrite your following files, please proceed with caution: \n\n - prompts/entity_extraction.txt \n\n - prompts/summarize_descriptions.txt \n\n - prompts/community_report.txt")
     
-    if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}"):
+    if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}", icon="🔧"):
         with st.spinner("Running..."):
             asyncio.run(start(base_path))

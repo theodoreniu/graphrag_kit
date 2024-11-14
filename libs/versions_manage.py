@@ -1,4 +1,5 @@
 import logging
+import shutil
 import sys
 import tracemalloc
 import streamlit as st
@@ -43,7 +44,7 @@ def versions_manage():
             size_mb = f"({size_mb} MB)"
         show_expander = st.session_state.get(f"show_expander_{rag_version}", True)
         if show_expander:
-            with st.expander(f"#### {rag_version} {size_mb}"):
+            with st.expander(f"#### 📁 {rag_version} {size_mb}"):
                 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
                     "1-Upload Files",
                     "2-Generate Data",
@@ -69,8 +70,25 @@ def versions_manage():
                 with tab6:
                     prompt_tuning(rag_version)
                 with tab7:
-                    if st.button("Delete", key=f"delete_{rag_version}"):
+                    if st.button("Export to ZIP", key=f"export_zip_{rag_version}", icon="📦"):
+                        export_project_to_zip(rag_version)
+                        
+                    if st.button("Delete", key=f"delete_{rag_version}", icon="🗑️"):
                         delete_rag_version(rag_version)
                         show_expander = False
                         st.session_state[f"show_expander_{rag_version}"] = False
 
+
+def export_project_to_zip(rag_version):
+    project_path = f"/app/projects/{rag_version}"
+    with st.spinner('Exporting ...'):
+        zip_file = f"/tmp/{rag_version}.zip"
+        if os.path.exists(zip_file):
+            os.remove(zip_file)
+        shutil.make_archive(f"/tmp/{rag_version}", 'zip', project_path)
+        with open(zip_file, "rb") as file:
+            st.download_button(
+                label=f"Download {rag_version}.zip",
+                data=file,
+                icon="💾",
+                file_name=f"{rag_version}.zip")

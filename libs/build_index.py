@@ -16,7 +16,7 @@ from libs.progress import PrintProgressReporter
 
 def build_index(project_name: str):
     try:
-        if st.button('Start Build', key='build_index_' + project_name):
+        if st.button('Start Build', key='build_index_' + project_name, icon="🚀"):
             with st.spinner("Building index..."):
                 progress_reporter = PrintProgressReporter("")
                 config = load_graphrag_config(project_name)
@@ -34,12 +34,14 @@ def build_index(project_name: str):
     except Exception as e:
         st.error(str(e))
 
-    if st.button("Clear index files", key="clear_index_" + project_name):
+    st.markdown("----------------------------")
+    
+    if st.button("Clear index files", key="clear_index_" + project_name, icon="🗑️"):
         run_command(f"rm -rf /app/projects/{project_name}/output/*")
         st.success("All files deleted.")
         time.sleep(3)
 
-    if st.button("Clear index cache files", key="clear_index_cache_" + project_name):
+    if st.button("Clear index cache files", key="clear_index_cache_" + project_name, icon="🗑️"):
         run_command(f"rm -rf /app/projects/{project_name}/cache/*")
         st.success("All cache files deleted.")
         time.sleep(3)
