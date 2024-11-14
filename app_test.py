@@ -68,6 +68,7 @@ def page(title: str):
         community_level = st.text_input("community_level", value=2)
         
     # project settings review
+    st.write(f"You selected: `{project_name}`")
     with st.expander("🔧 Project Settings Review"):
         set_settings(project_name, read_only=True)
     

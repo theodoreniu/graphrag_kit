@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import sys
 import tracemalloc
@@ -30,6 +31,9 @@ def page(title: str):
     if config.manage_tip:
         st.write(config.manage_tip)
 
+    # if st.button("Refresh Page", icon="🔄"):
+    #     st.success(f"Refresh Page at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
     restart_component()
     
     set_envs()
