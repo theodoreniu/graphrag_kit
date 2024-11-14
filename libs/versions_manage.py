@@ -30,21 +30,26 @@ sys.path.append(grandparent_dir)
 
 
 def versions_manage():
-    rag_versions_list = get_rag_versions()
-    if len(rag_versions_list) == 0:
-        return
-
+    st.session_state.rag_versions_list = get_rag_versions()
+    
     st.markdown("----------------------------")
-    st.markdown(f"# Projects ({len(rag_versions_list)})")
-    for rag_version in rag_versions_list:
+    if st.button("Refresh Projects", key="refresh", icon="🔄"):
+        st.session_state.rag_versions_list = get_rag_versions()
+        
+    if len(st.session_state.rag_versions_list) == 0:
+        return
+    
+    st.markdown(f"# Projects ({len(st.session_state.rag_versions_list)})")
+    
+    for rag_version in st.session_state.rag_versions_list:
         size_mb = get_directory_size(f"/app/projects/{rag_version}/output", ['.log'])
+
         if size_mb == 0:
             size_mb = ""
         else:
             size_mb = f"({size_mb} MB)"
-        show_expander = st.session_state.get(f"show_expander_{rag_version}", True)
-        if show_expander:
-            with st.expander(f"#### 📁 {rag_version} {size_mb}"):
+
+        with st.expander(f"#### 📁 {rag_version} {size_mb}"):
                 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
                     "1-Upload Files",
                     "2-Generate Data",
@@ -65,8 +70,6 @@ def versions_manage():
                     build_index(rag_version)
                 with tab5:
                     index_preview(rag_version)
-                # with tab6:
-                #     store_vector(rag_version)
                 with tab6:
                     prompt_tuning(rag_version)
                 with tab7:
@@ -75,8 +78,7 @@ def versions_manage():
                         
                     if st.button("Delete", key=f"delete_{rag_version}", icon="🗑️"):
                         delete_rag_version(rag_version)
-                        show_expander = False
-                        st.session_state[f"show_expander_{rag_version}"] = False
+                        st.session_state.rag_versions_list = get_rag_versions()
 
 
 def export_project_to_zip(rag_version):

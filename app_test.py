@@ -1,4 +1,5 @@
 
+import json
 import streamlit as st
 from dotenv import load_dotenv
 import io
@@ -202,6 +203,16 @@ def page(title: str):
                     modified_df.at[index, "community_level"] = community_level
                     modified_df.at[index, "response"] = response
                     modified_df.at[index, "score"] = score
+                    if 'reports' in context_data:
+                        modified_df.at[index, "reports"] = json.dumps(context_data['reports'], ensure_ascii=False)
+                    if 'entities' in context_data:
+                        modified_df.at[index, "entities"] = json.dumps(context_data['entities'], ensure_ascii=False)
+                    if 'relationships' in context_data:
+                        modified_df.at[index, "relationships"] = json.dumps(context_data['relationships'], ensure_ascii=False)
+                    if 'claims' in context_data:
+                        modified_df.at[index, "claims"] = json.dumps(context_data['claims'], ensure_ascii=False)
+                    if 'sources' in context_data:
+                        modified_df.at[index, "sources"] = json.dumps(context_data['sources'], ensure_ascii=False)
                         
                     st.success(f"GraphRAG ({score}%): {response}")
             
@@ -214,9 +225,9 @@ def page(title: str):
         
         st.markdown("## Download Test Results")
         st.download_button(
-            label="Download Test Results",
+            label="Download",
             data=output.getvalue(),
-            file_name=uploaded_file.name.replace(".xlsx", "_graphrag_test.xlsx"),
+            file_name=uploaded_file.name.replace(".xlsx", "_graphrag.xlsx"),
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
         

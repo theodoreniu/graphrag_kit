@@ -52,10 +52,12 @@ You are an intelligent assistant.
 
 def create_version():
     rag_versions_list = get_rag_versions()
+    project_languages = ["Simplified Chinese", "English"]
+    project_language = ""
     st.markdown("# New Project")
     today_hour = time.strftime("%Y%m%d%H", time.localtime())
     new_project_value = "Just New Project"
-    c1, c2 = st.columns(2)
+    c1, c2, c3 = st.columns(3)
     with c1:
         new_rag_version = st.text_input("Please input name",
                                         value=today_hour,
@@ -64,6 +66,9 @@ def create_version():
     with c2:
         rag_versions_list.insert(0, new_project_value)
         copy_from_project_name = st.selectbox("Copy from", rag_versions_list, key="create_from_project_name")
+    with c3:
+        if copy_from_project_name == new_project_value:
+            project_language = st.selectbox("Language", project_languages, key="project_language_select")
         
     btn = st.button("Create", key="confirm", icon="🚀")
     if btn:
@@ -80,10 +85,46 @@ def create_version():
                 initialize_project(path=root)
                 overwrite_settings_yaml(root, formatted_rag_version)
                 write_project_prompt(root)
+                modify_project_language(formatted_rag_version, project_language)
             else:
                 copy_project(copy_from_project_name, formatted_rag_version)
         except Exception as e:
             st.error(str(e))
+
+
+def modify_project_language(formatted_rag_version, project_language):
+    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+                          file_name="claim_extraction.txt",
+                          search_text="extract all entities that match the entity specification and all claims against those entities.",
+                          type="claim",
+                          project_language=project_language)
+    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+                          file_name="community_report.txt",
+                          search_text="technical capabilities, reputation, and noteworthy claims.",
+                          type="community",
+                          project_language=project_language)
+    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+                          file_name="entity_extraction.txt",
+                          search_text="identify all entities of those types from the text and all relationships among the identified entities.",
+                          type="entity",
+                          project_language=project_language)
+    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+                          file_name="summarize_descriptions.txt",
+                          search_text="and include the entity names so we have the full context.",
+                          type="entity",
+                          project_language=project_language)
+
+
+def modify_project_prompt(formatted_rag_version, file_name, search_text, project_language, type):
+    prompt_file = f"/app/projects/{formatted_rag_version}/prompts/{file_name}"
+    if os.path.exists(prompt_file):
+        with open(prompt_file, "r") as f:
+            prompt_content = f.read()
+            new_prompt_content = prompt_content.replace(
+                search_text,
+                f"{search_text} You should use {project_language} for {type} description.")
+            with open(prompt_file, "w") as f:
+                f.write(new_prompt_content)
 
 
 def check_project_exists(formatted_rag_version: str):
