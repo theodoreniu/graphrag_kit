@@ -223,6 +223,7 @@ def page():
             label="Download Test Results",
             data=output.getvalue(),
             file_name=uploaded_file.name,
+            icon="💾",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
         
