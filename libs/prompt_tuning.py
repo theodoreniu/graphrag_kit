@@ -6,7 +6,6 @@ import streamlit as st
 
 import graphrag.api as api
 
-import libs.config as config
 from graphrag.config import load_config
 
 
@@ -21,19 +20,27 @@ async def start(base_path:str):
             root=base_path,
         )
 
-    st.info("## entity_extraction_prompt\n\nprompts/entity_extraction.txt")
-    st.text(entity_extraction_prompt)
+    tab1, tab2, tab3 = st.tabs([
+        "🔍 entity_extraction_prompt",
+        "📝 entity_summarization_prompt",
+        "👥 community_summarization_prompt"
+        ])
+    with tab1:
+        st.markdown("`prompts/entity_extraction.txt`")
+        st.text(entity_extraction_prompt)
 
-    st.info("## entity_summarization_prompt\n\nprompts/summarize_descriptions.txt")
-    st.text(entity_summarization_prompt)
+    with tab2:
+        st.markdown("`prompts/summarize_descriptions.txt`")
+        st.text(entity_summarization_prompt)
 
-    st.info("## community_summarization_prompt\n\nprompts/community_report.txt")
-    st.text(community_summarization_prompt)
+    with tab3:
+        st.markdown("`prompts/community_report.txt`")
+        st.text(community_summarization_prompt)
 
     entity_extraction_prompt_path = f"{base_path}/prompts/entity_extraction.txt"
     entity_summarization_prompt_path = f"{base_path}/prompts/summarize_descriptions.txt"
     community_summarization_prompt_path = f"{base_path}/prompts/community_report.txt"
-
+    
     with open(entity_extraction_prompt_path, "wb") as file:
         file.write(entity_extraction_prompt.encode(encoding="utf-8", errors="strict"))
         
@@ -49,6 +56,6 @@ def prompt_tuning(rag_version: str):
     
     st.warning("This operation will overwrite your following files, please proceed with caution: \n\n - prompts/entity_extraction.txt \n\n - prompts/summarize_descriptions.txt \n\n - prompts/community_report.txt")
     
-    if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}", icon="🔧"):
+    if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}", icon="🚀"):
         with st.spinner("Running..."):
             asyncio.run(start(base_path))
