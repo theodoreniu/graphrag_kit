@@ -45,10 +45,6 @@ def response_score(query:str, standard_answer:str, generated_answer:str):
 
 
 def page():
-    st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}`")
-    if config.test_tip:
-        st.write(config.test_tip)
-        
     restart_component()
     
     rag_versions_list = get_rag_versions()

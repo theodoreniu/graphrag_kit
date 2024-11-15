@@ -1,8 +1,5 @@
-import pandas as pd
 import streamlit as st
 import os
-import libs.config as config
-from code_editor import code_editor
 from streamlit_ace import st_ace
 
 

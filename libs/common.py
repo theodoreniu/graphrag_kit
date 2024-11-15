@@ -136,8 +136,12 @@ def run_command(command: str, output: bool=False):
 
 
 def restart_component():
+    st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}` App started at: `{config.app_started_at}`")
+    
+    if config.app_tip:
+        st.write(config.app_tip)
+        
     with st.expander("App Server"):
-        st.write(f"App started at: `{config.app_started_at}`")
         if st.button("Restart"):
             st.success("You need to refresh page later.")
             os._exit(1)
@@ -145,3 +149,5 @@ def restart_component():
             os.kill(os.getpid(), signal.SIGTERM)
             st.stop()
             sys.exit()
+
+    st.markdown("-----------------")
