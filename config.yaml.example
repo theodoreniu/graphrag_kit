@@ -2,7 +2,7 @@ credentials:
   usernames:
     graphrag: # can see all projects
       email: admin@gmail.com
-      name: Admin
+      name: GraphRAG Admin
       password: abc
     jsmith:
       email: jsmith@gmail.com
