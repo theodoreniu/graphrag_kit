@@ -71,6 +71,10 @@ def get_username():
 def format_rag_version(version: str):
     if not re.match("^[A-Za-z0-9_-]*$", version):
         raise ValueError("Name can only contain letters and numbers.")
+    
+    if is_admin():
+        return version.lower()
+    
     return f'{get_username()}_{version.lower()}'
 
 
