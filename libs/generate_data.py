@@ -65,6 +65,12 @@ def generate_data(rag_version: str):
                         file_path = os.path.join(root, file)
                         convert_file(file_path, file, rag_version, pdf_vision_option)
 
+                #  3. make file permissions to another user can write
+                for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        os.chmod(file_path, 0o666)
+
                 st.success("Data generated successfully.")
 
     if st.button("Download generated files", key=f"downloads_input_files_{rag_version}", icon="💾"):

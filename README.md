@@ -18,7 +18,14 @@ Copy and set your environment variables:
 cp .env.example .env
 ```
 
-Configure the environment variables in the .env file.
+## Set Authentication (Optional)
+
+If you want to set authentication, copy and set your config.yaml:
+
+```bash
+cp config.yaml.example config.yaml
+```
+
 
 ## Start App
 

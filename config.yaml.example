@@ -1,0 +1,18 @@
+credentials:
+  usernames:
+    graphrag: # can see all projects
+      email: admin@gmail.com
+      name: GraphRAG Admin
+      password: abc
+    jsmith:
+      email: jsmith@gmail.com
+      name: John Smith
+      password: abc
+    rbriggs:
+      email: rbriggs@gmail.com
+      name: Rebecca Briggs
+      password: abc
+cookie:
+  expiry_days: 30
+  key: random_signature_key # Must be string
+  name: random_cookie_name

@@ -52,11 +52,12 @@ You are an intelligent assistant.
 
 def create_version():
     rag_versions_list = get_rag_versions()
-    project_languages = ["Simplified Chinese", "English"]
+    project_language_default = "No Specific"
+    project_languages = [project_language_default, "Simplified Chinese", "English"]
     project_language = ""
+    new_project_value = "Just New Project"
     st.markdown("# New Project")
     today_hour = time.strftime("%Y%m%d%H", time.localtime())
-    new_project_value = "Just New Project"
     c1, c2, c3 = st.columns(3)
     with c1:
         new_rag_version = st.text_input("Please input name",
@@ -72,22 +73,23 @@ def create_version():
         
     btn = st.button("Create", key="confirm", icon="🚀")
     if btn:
-        formatted_rag_version = format_rag_version(new_rag_version)
+        formatted_project_name = format_rag_version(new_rag_version)
         
-        if check_project_exists(formatted_rag_version):
-            st.error(f"Project {formatted_rag_version} already exists.")
+        if check_project_exists(formatted_project_name):
+            st.error(f"Project {formatted_project_name} already exists.")
             return
         
-        root = os.path.join("/app", "projects", formatted_rag_version)
+        root = os.path.join("/app", "projects", formatted_project_name)
         
         try:
             if copy_from_project_name == new_project_value:
                 initialize_project(path=root)
-                overwrite_settings_yaml(root, formatted_rag_version)
+                overwrite_settings_yaml(root, formatted_project_name)
                 write_project_prompt(root)
-                modify_project_language(formatted_rag_version, project_language)
+                if project_language != project_language_default:
+                    modify_project_language(formatted_project_name, project_language)
             else:
-                copy_project(copy_from_project_name, formatted_rag_version)
+                copy_project(copy_from_project_name, formatted_project_name)
         except Exception as e:
             st.error(str(e))
 

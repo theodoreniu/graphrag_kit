@@ -18,7 +18,7 @@ def settings(project_name: str, read_only: bool=False):
 
     settings = get_setting_file(settings_file)        
     new_settings = st_ace(settings,
-                   theme="tomorrow_night",
+                   theme="chaos",
                    language='yaml',
                    height=400,
                    auto_update=True,
@@ -39,7 +39,7 @@ def claim_extraction(project_name: str, read_only: bool=False):
 
     settings = get_setting_file(settings_file)        
     new_settings = st_ace(settings,
-                   theme="tomorrow_night",
+                   theme="chaos",
                    language='plain_text',
                    height=400,
                    auto_update=True,
@@ -59,7 +59,7 @@ def community_report(project_name: str, read_only: bool=False):
 
     settings = get_setting_file(settings_file)        
     new_settings = st_ace(settings,
-                   theme="tomorrow_night",
+                   theme="chaos",
                    language='plain_text',
                    height=400,
                    auto_update=True,
@@ -79,7 +79,7 @@ def entity_extraction(project_name: str, read_only: bool=False):
 
     settings = get_setting_file(settings_file)        
     new_settings = st_ace(settings,
-                   theme="tomorrow_night",
+                   theme="chaos",
                    language='plain_text',
                    height=400,
                    auto_update=True,
@@ -99,7 +99,7 @@ def summarize_descriptions(project_name: str, read_only: bool=False):
 
     settings = get_setting_file(settings_file)        
     new_settings = st_ace(settings,
-                   theme="tomorrow_night",
+                   theme="chaos",
                    language='plain_text',
                    height=400,
                    auto_update=True,
@@ -119,7 +119,7 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
 
     settings = get_setting_file(settings_file)        
     new_settings = st_ace(settings,
-                   theme="tomorrow_night",
+                   theme="chaos",
                    language='plain_text',
                    height=400,
                    auto_update=True,
