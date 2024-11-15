@@ -1,3 +1,4 @@
+import json
 import re
 import os
 import subprocess
@@ -71,6 +72,10 @@ def get_username():
 def format_rag_version(version: str):
     if not re.match("^[A-Za-z0-9_-]*$", version):
         raise ValueError("Name can only contain letters and numbers.")
+    
+    if is_admin():
+        return version.lower()
+    
     return f'{get_username()}_{version.lower()}'
 
 
@@ -151,3 +156,21 @@ def restart_component():
             sys.exit()
 
     st.markdown("-----------------")
+
+
+def get_cache_json_from_file(cache_key: str):
+    cache_file = f"/app/cache/query_cache/{cache_key}.json"
+    if os.path.exists(cache_file):
+        with open(cache_file, "r") as file:
+            return json.load(file)
+    return None
+
+
+def set_cache_json_to_file(cache_key: str, data: dict):
+    cache_file = f"/app/cache/query_cache/{cache_key}.json"
+    cache_file_dir = os.path.dirname(cache_file)
+    if not os.path.exists(cache_file_dir):
+        os.makedirs(cache_file_dir, exist_ok=True)
+        
+    with open(cache_file, "w") as file:
+        json.dump(data, file, ensure_ascii=False)

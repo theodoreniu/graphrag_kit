@@ -5,7 +5,7 @@ import streamlit as st
 from dotenv import load_dotenv
 import io
 from libs.save_settings import set_settings
-from libs.common import get_rag_versions, project_path, restart_component
+from libs.common import get_cache_json_from_file, get_rag_versions, project_path, restart_component, set_cache_json_to_file
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
 import pandas as pd
@@ -148,6 +148,7 @@ def page():
     st.markdown("Put the question in a field called `query`, When all queries are executed, you can download the file.")
     st.markdown("If a column named `answer` is used as the standard answer, automated testing calculates answer score.")
     st.markdown("Currently, only `Local Search` is supported.")
+    st.markdown("Query `cache` enabled, the same query will not be executed multiple times.")
     
     uploaded_file = st.file_uploader(
         label="upload",
@@ -178,25 +179,32 @@ def page():
                 with st.spinner(f'Generating ...'):
                     
                     improve_query_text = improve_query(project_name, row['query'])
+
+                    cache_key = f"local_search_{project_name}_{hash(improve_query_text)}_{community_level}"
+                    cache = get_cache_json_from_file(cache_key)
                     
-                    (response, context_data) = run_local_search(
-                        root_dir=project_path(project_name),
-                        query=improve_query_text,
-                        community_level=int(community_level),
-                        response_type="Multiple Paragraphs",
-                        streaming=False,
-                        config_filepath=None,
-                        data_dir=None,
-                    )
+                    if cache:
+                        response = cache['response']
+                        context_data = cache['context_data']
+                    else:
+                        (response, context_data) = run_local_search(
+                            root_dir=project_path(project_name),
+                            query=improve_query_text,
+                            community_level=int(community_level),
+                            response_type="Multiple Paragraphs",
+                            streaming=False,
+                            config_filepath=None,
+                                data_dir=None,
+                        )
+                        set_cache_json_to_file(cache_key, {
+                            'response': response,
+                            'context_data': context_data
+                        })
                     
                     st.info(f"Query: {row['query']}")
                     
-                    # score = "0"
-                    
                     if 'answer' in row:
                         st.warning(f"Answer: {row['answer']}")
-                        # score = response_score(improve_query_text, row['answer'], response)
-                        # modified_df.at[index, f"{project_name}_score"] = score
 
                     modified_df.at[index, f"{project_name}_response"] = response
                     modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False)
@@ -210,11 +218,12 @@ def page():
             for sheet_name, df in modified_sheets.items():
                 df.to_excel(writer, sheet_name=sheet_name, index=False)   
         
-        st.markdown("## Download Test Results")
+        st.markdown("-------------------------------------------")
         st.download_button(
-            label="Download",
+            label="Download Test Results",
             data=output.getvalue(),
             file_name=uploaded_file.name,
+            icon="💾",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
         

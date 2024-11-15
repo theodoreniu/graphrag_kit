@@ -61,14 +61,10 @@ if __name__ == "__main__":
                 authenticator.login()
 
                 if st.session_state['authentication_status']:
-                    if not is_admin():
-                        st.error('You are not admin, please logout and login with admin account.')
-                        authenticator.logout()
-                    else: 
-                        st.write(f'Welcome `{st.session_state["name"]}`')
-                        authenticator.logout()
-                        st.markdown("-----------------")
-                        page()
+                    st.write(f'Welcome `{st.session_state["name"]}`')
+                    authenticator.logout()
+                    st.markdown("-----------------")
+                    page()
                 elif st.session_state['authentication_status'] is False:
                     st.error('Username/password is incorrect')
                 elif st.session_state['authentication_status'] is None:
