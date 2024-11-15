@@ -180,7 +180,7 @@ def page():
                     
                     improve_query_text = improve_query(project_name, row['query'])
 
-                    cache_key = f"local_search_{project_name}_{hash(improve_query_text)}_{community_level}"
+                    cache_key = f"local_search_{project_name}_{improve_query_text}_{community_level}"
                     cache = get_cache_json_from_file(cache_key)
                     
                     if cache:

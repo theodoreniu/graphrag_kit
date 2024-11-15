@@ -12,6 +12,8 @@ from pathlib import Path
 import sys
 import signal
 
+import hashlib
+
 
 def project_path(project_name: str):
     return Path("/app/projects") / project_name
@@ -158,7 +160,14 @@ def restart_component():
     st.markdown("-----------------")
 
 
+def generate_text_fingerprint(text, algorithm="sha256"):
+    hash_object = hashlib.new(algorithm)
+    hash_object.update(text.encode('utf-8'))
+    return hash_object.hexdigest()
+
+
 def get_cache_json_from_file(cache_key: str):
+    cache_key = generate_text_fingerprint(cache_key)
     cache_file = f"/app/cache/query_cache/{cache_key}.json"
     if os.path.exists(cache_file):
         with open(cache_file, "r") as file:
@@ -167,6 +176,7 @@ def get_cache_json_from_file(cache_key: str):
 
 
 def set_cache_json_to_file(cache_key: str, data: dict):
+    cache_key = generate_text_fingerprint(cache_key)
     cache_file = f"/app/cache/query_cache/{cache_key}.json"
     cache_file_dir = os.path.dirname(cache_file)
     if not os.path.exists(cache_file_dir):
