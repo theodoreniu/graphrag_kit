@@ -9,9 +9,8 @@ app_version = "0.0.6"
 graphrag_version = "0.4.1"
 app_started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 manage_tip = os.getenv('MANAGE_TIP', '')
-app_name = os.getenv('APP_NAME', 'rag')
+app_name = os.getenv('APP_NAME', 'graphrag')
 test_tip = os.getenv('TEST_TIP', '')
-app_password = os.getenv('APP_PASSWORD', '')
 
 is_debug = os.getenv('DEBUG_MODE') == 'true'
 api_key = os.getenv('API_KEY', 'api_key')

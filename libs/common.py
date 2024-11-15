@@ -56,10 +56,22 @@ def debug(data:any, title:str=""):
         st.warning(data)
 
 
+def is_admin():
+    if st.session_state['authentication_status']:
+        return st.session_state['username'] == config.app_name
+    return True
+
+
+def get_username():
+    if st.session_state['authentication_status']:
+        return st.session_state['username']
+    return config.app_name
+
+
 def format_rag_version(version: str):
     if not re.match("^[A-Za-z0-9_-]*$", version):
         raise ValueError("Name can only contain letters and numbers.")
-    return f'{config.app_name}_{version.lower()}'
+    return f'{get_username()}_{version.lower()}'
 
 
 def delete_rag_version(version: str):
@@ -76,17 +88,10 @@ def get_rag_versions():
     version_path = '/app/projects'
     debug(f"scan to find versions in {version_path}")
     versions = list_subdirectories(version_path)
-    return [v for v in versions if v.startswith(config.app_name)]
-
-
-def is_login():
-    if not config.app_password:
-        return True
-    if 'password' not in st.session_state:
-        return False
-    if st.session_state.password != config.app_password:
-        return False
-    return True
+    if is_admin():
+        return versions
+    
+    return [v for v in versions if v.startswith(get_username())]
 
 
 def javascript_code():

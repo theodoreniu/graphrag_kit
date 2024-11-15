@@ -44,8 +44,7 @@ def response_score(query:str, standard_answer:str, generated_answer:str):
     return ai_txt
 
 
-def page(title: str):
-    st.title(title)
+def page():
     st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}`")
     if config.test_tip:
         st.write(config.test_tip)
@@ -238,7 +237,7 @@ def page(title: str):
 
 
 if __name__ == "__main__":
-        
+    try:
         page_title = "GraphRAG Test"
         st.set_page_config(
             page_title=page_title,
@@ -246,9 +245,10 @@ if __name__ == "__main__":
                             layout="wide",
                             initial_sidebar_state='expanded')
         st.image("avatars/logo.svg", width=100)
+        st.title(page_title)
         
         if not os.path.exists('./config.yaml'):
-            page(page_title)
+            page()
         else:
             with open('./config.yaml') as file:
                 yaml_config = yaml.load(file, Loader=SafeLoader)
@@ -258,15 +258,17 @@ if __name__ == "__main__":
                     yaml_config['cookie']['key'],
                     yaml_config['cookie']['expiry_days'],
                 )
-                try:
-                    authenticator.login()
-                except Exception as e:
-                    st.error(e)
+                
+                authenticator.login()
+
                 if st.session_state['authentication_status']:
+                    st.write(f'Welcome `{st.session_state["name"]}`')
                     authenticator.logout()
-                    st.write(f'Welcome *{st.session_state["name"]}*')
-                    page(page_title)
+                    st.markdown("-----------------")
+                    page()
                 elif st.session_state['authentication_status'] is False:
                     st.error('Username/password is incorrect')
                 elif st.session_state['authentication_status'] is None:
                     st.warning('Please enter your username and password')
+    except Exception as e:
+        st.error(e)
