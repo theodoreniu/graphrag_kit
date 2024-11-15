@@ -5,7 +5,7 @@ import streamlit as st
 from dotenv import load_dotenv
 import io
 from libs.save_settings import set_settings
-from libs.common import get_cache_json_from_file, get_rag_versions, project_path, restart_component, set_cache_json_to_file
+from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_rag_versions, project_path, restart_component, set_cache_json_to_file
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
 import pandas as pd
@@ -180,7 +180,7 @@ def page():
                     
                     improve_query_text = improve_query(project_name, row['query'])
 
-                    cache_key = f"local_search_{project_name}_{improve_query_text}_{community_level}"
+                    cache_key = f"local_search_{project_name}_{index}_{community_level}_{generate_text_fingerprint(improve_query_text)}"
                     cache = get_cache_json_from_file(cache_key)
                     
                     if cache:
@@ -207,7 +207,7 @@ def page():
                         st.warning(f"Answer: {row['answer']}")
 
                     modified_df.at[index, f"{project_name}_response"] = response
-                    modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False)
+                    modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
  
                     st.success(f"GraphRAG: {response}")
             

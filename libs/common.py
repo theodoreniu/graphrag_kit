@@ -167,7 +167,6 @@ def generate_text_fingerprint(text, algorithm="sha256"):
 
 
 def get_cache_json_from_file(cache_key: str):
-    cache_key = generate_text_fingerprint(cache_key)
     cache_file = f"/app/cache/query_cache/{cache_key}.json"
     if os.path.exists(cache_file):
         with open(cache_file, "r") as file:
@@ -176,11 +175,10 @@ def get_cache_json_from_file(cache_key: str):
 
 
 def set_cache_json_to_file(cache_key: str, data: dict):
-    cache_key = generate_text_fingerprint(cache_key)
     cache_file = f"/app/cache/query_cache/{cache_key}.json"
     cache_file_dir = os.path.dirname(cache_file)
     if not os.path.exists(cache_file_dir):
         os.makedirs(cache_file_dir, exist_ok=True)
         
     with open(cache_file, "w") as file:
-        json.dump(data, file, ensure_ascii=False)
+        json.dump(data, file, ensure_ascii=False, indent=4)
