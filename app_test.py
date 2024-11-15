@@ -1,5 +1,6 @@
 
 import json
+import os
 import streamlit as st
 from dotenv import load_dotenv
 import io
@@ -8,10 +9,12 @@ from libs.common import get_rag_versions, project_path, restart_component
 from libs.set_prompt import improve_query
 from libs.store_vector import AI_SEARCH, PG
 import pandas as pd
-from  libs.common import is_login
 import libs.config as config
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
 from openai import AzureOpenAI
+import yaml
+from yaml.loader import SafeLoader
+import streamlit_authenticator as stauth
 
 load_dotenv()
 
@@ -193,28 +196,17 @@ def page(title: str):
                     
                     st.info(f"Query: {row['query']}")
                     
-                    score = "0"
+                    # score = "0"
                     
                     if 'answer' in row:
                         st.warning(f"Answer: {row['answer']}")
-                        score = response_score(improve_query_text, row['answer'], response)
-   
-                    modified_df.at[index, "project_name"] = project_name
-                    modified_df.at[index, "community_level"] = community_level
-                    modified_df.at[index, "response"] = response
-                    modified_df.at[index, "score"] = score
-                    if 'reports' in context_data:
-                        modified_df.at[index, "reports"] = json.dumps(context_data['reports'], ensure_ascii=False)
-                    if 'entities' in context_data:
-                        modified_df.at[index, "entities"] = json.dumps(context_data['entities'], ensure_ascii=False)
-                    if 'relationships' in context_data:
-                        modified_df.at[index, "relationships"] = json.dumps(context_data['relationships'], ensure_ascii=False)
-                    if 'claims' in context_data:
-                        modified_df.at[index, "claims"] = json.dumps(context_data['claims'], ensure_ascii=False)
-                    if 'sources' in context_data:
-                        modified_df.at[index, "sources"] = json.dumps(context_data['sources'], ensure_ascii=False)
-                        
-                    st.success(f"GraphRAG ({score}%): {response}")
+                        # score = response_score(improve_query_text, row['answer'], response)
+                        # modified_df.at[index, f"{project_name}_score"] = score
+
+                    modified_df.at[index, f"{project_name}_response"] = response
+                    modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False)
+ 
+                    st.success(f"GraphRAG: {response}")
             
             modified_sheets[sheet_name] = modified_df
         
@@ -227,7 +219,7 @@ def page(title: str):
         st.download_button(
             label="Download",
             data=output.getvalue(),
-            file_name=uploaded_file.name.replace(".xlsx", "_graphrag.xlsx"),
+            file_name=uploaded_file.name,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
         
@@ -246,7 +238,7 @@ def page(title: str):
 
 
 if __name__ == "__main__":
-
+        
         page_title = "GraphRAG Test"
         st.set_page_config(
             page_title=page_title,
@@ -254,16 +246,27 @@ if __name__ == "__main__":
                             layout="wide",
                             initial_sidebar_state='expanded')
         st.image("avatars/logo.svg", width=100)
-
-        if is_login():
+        
+        if not os.path.exists('./config.yaml'):
             page(page_title)
         else:
-            pass_input = st.text_input("Please input password", type="password")
-            pass_btn = st.button("Login", icon="🔑")
-            if pass_btn:
-                if pass_input != config.app_password:
-                    st.error("Password error")
-                else:
-                    st.session_state.password = config.app_password
-                    st.success("Login success")
+            with open('./config.yaml') as file:
+                yaml_config = yaml.load(file, Loader=SafeLoader)
+                authenticator = stauth.Authenticate(
+                    yaml_config['credentials'],
+                    yaml_config['cookie']['name'],
+                    yaml_config['cookie']['key'],
+                    yaml_config['cookie']['expiry_days'],
+                )
+                try:
+                    authenticator.login()
+                except Exception as e:
+                    st.error(e)
+                if st.session_state['authentication_status']:
+                    authenticator.logout()
+                    st.write(f'Welcome *{st.session_state["name"]}*')
                     page(page_title)
+                elif st.session_state['authentication_status'] is False:
+                    st.error('Username/password is incorrect')
+                elif st.session_state['authentication_status'] is None:
+                    st.warning('Please enter your username and password')

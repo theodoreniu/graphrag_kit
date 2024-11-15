@@ -57,7 +57,7 @@ def debug(data:any, title:str=""):
 
 
 def format_rag_version(version: str):
-    if not re.match("^[A-Za-z0-9]*$", version):
+    if not re.match("^[A-Za-z0-9_-]*$", version):
         raise ValueError("Name can only contain letters and numbers.")
     return f'{config.app_name}_{version.lower()}'
 

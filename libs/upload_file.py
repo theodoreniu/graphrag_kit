@@ -70,6 +70,9 @@ def upload_file(rag_version: str):
         for uploaded_file in uploaded_files:
             with open(f"/app/projects/{rag_version}/original/{uploaded_file.name}", "wb") as f:
                 f.write(uploaded_file.read())
+                # make file permissions to another user can write
+                os.chmod(f"/app/projects/{rag_version}/original/{uploaded_file.name}", 0o666)
+
         list_uploaded_files(file_list_container, rag_version)
         st.success('File uploaded successfully.')
 

@@ -54,10 +54,9 @@ def versions_manage():
                     "1-Upload Files",
                     "2-Generate Data",
                     "3-GraphRAG Settings",
-                    "4-Build GraphRAG",
-                    "5-Index Preview",
-                    # "6-Store Vectors", 
-                    "6-Prompt Tuning",
+                    "4-Prompt Tuning",
+                    "5-Build Index",
+                    "6-Index Preview",
                     "7-Manage"
                     ])
                 with tab1:
@@ -67,11 +66,11 @@ def versions_manage():
                 with tab3:
                     set_settings(rag_version)
                 with tab4:
-                    build_index(rag_version)
-                with tab5:
-                    index_preview(rag_version)
-                with tab6:
                     prompt_tuning(rag_version)
+                with tab5:
+                    build_index(rag_version)
+                with tab6:
+                    index_preview(rag_version)
                 with tab7:
                     if st.button("Export to ZIP", key=f"export_zip_{rag_version}", icon="📦"):
                         export_project_to_zip(rag_version)
