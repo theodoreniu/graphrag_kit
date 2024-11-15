@@ -5,7 +5,7 @@ from datetime import datetime
 
 load_dotenv()
 
-app_version = "0.0.6"
+app_version = "0.0.7"
 graphrag_version = "0.4.1"
 app_started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 app_name = os.getenv('APP_NAME', 'graphrag')
