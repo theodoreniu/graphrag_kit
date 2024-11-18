@@ -20,7 +20,7 @@ class PrintProgressReporter(ProgressReporter):
     def dispose(self) -> None:
         """Dispose of the progress reporter."""
 
-    def child(self, prefix: str, transient: bool = True) -> "ProgressReporter":
+    def child(self, prefix: str, transient: bool=True) -> "ProgressReporter":
         """Create a child progress bar."""
         return PrintProgressReporter(prefix)
 
@@ -40,7 +40,7 @@ class PrintProgressReporter(ProgressReporter):
 
     def info(self, message: str) -> None:
         """Report information."""
-        st.info(message)  # noqa T201
+        print(message)  # noqa T201
 
     def success(self, message: str) -> None:
         """Report success."""

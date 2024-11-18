@@ -1,9 +1,11 @@
 
 import json
 import os
+import re
 import streamlit as st
 from dotenv import load_dotenv
 import io
+from libs.render_context import get_real_response, render_context_data_global, render_context_data_local, render_response
 from libs.save_settings import set_settings
 from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_rag_versions, project_path, restart_component, set_cache_json_to_file
 from libs.set_prompt import improve_query
@@ -65,7 +67,10 @@ def page():
         project_name = st.selectbox("Project", rag_versions_list)
     with c2:
         community_level = st.text_input("community_level", value=2)
-        
+    
+    st.session_state['project_name'] = project_name
+    st.session_state['community_level'] = community_level
+    
     # project settings review
     st.write(f"You selected: `{project_name}`")
     with st.expander("🔧 Project Settings Review"):
@@ -92,16 +97,15 @@ def page():
                 with st.spinner('Generating ...'):
                     (response, context_data) = run_local_search(
                         root_dir=project_path(project_name),
-                        query=improve_query(project_name, query),
+                        query=query,
                         community_level=int(community_level),
                         response_type="Multiple Paragraphs",
                         streaming=False,
                         config_filepath=None,
                         data_dir=None,
                     )
-                    st.success(response)
-                    with st.expander("Context"):
-                        st.write(context_data)
+                    render_response(response)
+                    render_context_data_local(context_data)
         st.markdown("About Local Search: https://microsoft.github.io/graphrag/query/local_search/")
     with tab2:
         if st.button('🔎 Global Search', key="global_search"):
@@ -118,9 +122,8 @@ def page():
                         config_filepath=None,
                         data_dir=None,
                     )
-                    st.success(response)
-                    with st.expander("Context"):
-                        st.write(context_data)
+                    render_response(response)
+                    render_context_data_global(context_data)
         st.markdown("About Global Search: https://microsoft.github.io/graphrag/query/global_search/")
     with tab3:
         if st.button('🔎 Drift Search', key="run_drift_search"):
@@ -137,9 +140,7 @@ def page():
                         config_filepath=None,
                         data_dir=None,
                     )
-                    st.success(response)
-                    with st.expander("Context"):
-                        st.write(context_data)
+                    render_response(response)
         st.markdown("About DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
 
     st.markdown("-----------------")
@@ -149,6 +150,8 @@ def page():
     st.markdown("If a column named `answer` is used as the standard answer, automated testing calculates answer score.")
     st.markdown("Currently, only `Local Search` is supported.")
     st.markdown("Query `cache` enabled, the same query will not be executed multiple times.")
+    
+    enable_print_context = st.checkbox("Print every item context", value=False)
     
     uploaded_file = st.file_uploader(
         label="upload",
@@ -178,9 +181,9 @@ def page():
                 st.markdown(f"## {index_name}")
                 with st.spinner(f'Generating ...'):
                     
-                    improve_query_text = improve_query(project_name, row['query'])
+                    query = row['query']
 
-                    cache_key = f"local_search_{project_name}_{index}_{community_level}_{generate_text_fingerprint(improve_query_text)}"
+                    cache_key = f"local_search_{project_name}_{index}_{community_level}_{generate_text_fingerprint(query)}"
                     cache = get_cache_json_from_file(cache_key)
                     
                     if cache:
@@ -189,7 +192,7 @@ def page():
                     else:
                         (response, context_data) = run_local_search(
                             root_dir=project_path(project_name),
-                            query=improve_query_text,
+                            query=query,
                             community_level=int(community_level),
                             response_type="Multiple Paragraphs",
                             streaming=False,
@@ -207,9 +210,12 @@ def page():
                         st.warning(f"Answer: {row['answer']}")
 
                     modified_df.at[index, f"{project_name}_response"] = response
+                    result = get_real_response(response)
+                    st.success(f"GraphRAG (chars {len(result)}): {response}")
+                    modified_df.at[index, f"{project_name}_response_count"] = len(result)
                     modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
- 
-                    st.success(f"GraphRAG: {response}")
+                    if enable_print_context:
+                        render_context_data_local(context_data)
             
             modified_sheets[sheet_name] = modified_df
         
