@@ -151,6 +151,8 @@ def page():
     st.markdown("Currently, only `Local Search` is supported.")
     st.markdown("Query `cache` enabled, the same query will not be executed multiple times.")
     
+    enable_print_context = st.checkbox("Print every item context", value=False)
+    
     uploaded_file = st.file_uploader(
         label="upload",
         type=['xlsx'],
@@ -208,13 +210,12 @@ def page():
                         st.warning(f"Answer: {row['answer']}")
 
                     modified_df.at[index, f"{project_name}_response"] = response
-                    
-                    st.success(f"GraphRAG ({len(response)}): {response}")
                     result = get_real_response(response)
-                    st.success(f"Effective ({len(result)}): {result}")
+                    st.success(f"GraphRAG (chars {len(result)}): {response}")
                     modified_df.at[index, f"{project_name}_response_count"] = len(result)
                     modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
-                    render_context_data_local(context_data)
+                    if enable_print_context:
+                        render_context_data_local(context_data)
             
             modified_sheets[sheet_name] = modified_df
         

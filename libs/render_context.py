@@ -63,6 +63,6 @@ def render_context_data_global(context_data:dict):
 
 
 def render_response(response:str):
-    st.success(f"GraphRAG ({len(response)}): {response}")
+    response = response.strip()
     result = get_real_response(response)
-    st.success(f"Effective ({len(result)}): {result}")
+    st.success(f"GraphRAG (chars {len(result)}): {response}")
