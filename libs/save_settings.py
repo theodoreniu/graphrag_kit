@@ -125,10 +125,9 @@ def project_prompt_setting(project_name: str, read_only: bool=False):
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
-                   readonly=read_only,
                    show_print_margin=True,
                    key=f"project_prompt_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_project_prompt_{project_name}", icon="💾"):
+    if st.button("Save", key=f"save_project_prompt_{project_name}", icon="💾"):
         if not check_prompt(new_settings):
             st.error("Prompt must contain {query}")
             return
@@ -168,4 +167,5 @@ def input_files(project_name: str):
     if not os.path.exists(files_path):
         os.makedirs(files_path)
     files = os.listdir(files_path)
+    st.markdown(f"Items: `{len(files)}`")
     st.write(files)
