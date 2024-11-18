@@ -8,6 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+COPY patch/search.py /usr/local/lib/python3.12/site-packages/graphrag/query/structured_search/local_search/
+
 ARG APP_URL="http://127.0.0.1"
 ENV APP_URL=$APP_URL
 
