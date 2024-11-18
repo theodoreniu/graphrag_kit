@@ -42,6 +42,6 @@ def get_parquet_file(rag_version:str, artifact_name: str):
         return
     
     pdc = pd.read_parquet(parquet_path)
-    st.write(f"Items: {len(pdc)}")
+    st.write(f"Items: `{len(pdc)}`")
     st.write(pdc.head(n=20000))
         

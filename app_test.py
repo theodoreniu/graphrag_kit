@@ -1,6 +1,7 @@
 
 import json
 import os
+import re
 import streamlit as st
 from dotenv import load_dotenv
 import io
@@ -209,7 +210,9 @@ def page():
                     modified_df.at[index, f"{project_name}_response"] = response
                     modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
  
-                    st.success(f"GraphRAG: {response}")
+                    st.success(f"GraphRAG ({len(response)}): {response}")
+                    result = re.match(r"^[^[]*", response).group(0).strip()
+                    st.success(f"Effective ({len(result)}): {result}")
             
             modified_sheets[sheet_name] = modified_df
         
