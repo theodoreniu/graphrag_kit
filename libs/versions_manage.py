@@ -51,13 +51,13 @@ def versions_manage():
 
         with st.expander(f"#### 📁 {rag_version} {size_mb}"):
                 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-                    "1-Upload Files",
-                    "2-Generate Data",
-                    "3-GraphRAG Settings",
-                    "4-Prompt Tuning",
-                    "5-Build Index",
-                    "6-Index Preview",
-                    "7-Manage"
+                    "1 - Upload Files",
+                    "2 - Generate Data",
+                    "3 - GraphRAG Settings",
+                    "4 - Prompt Tuning",
+                    "5 - Build Index",
+                    "6 - Index Preview",
+                    "7 - Manage"
                     ])
                 with tab1:
                     upload_file(rag_version)

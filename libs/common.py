@@ -5,9 +5,7 @@ import subprocess
 import streamlit as st
 from theodoretools.fs import list_subdirectories
 import libs.config as config
-from graphrag.config import (
-    load_config,
-)
+from graphrag.config.load_config import load_config
 from pathlib import Path
 import sys
 import signal
@@ -60,8 +58,12 @@ def debug(data:any, title:str=""):
 
 
 def is_admin():
+    if not os.path.exists('./config.yaml'):
+        return True
+    
     if st.session_state['authentication_status']:
         return st.session_state['username'] == config.app_name
+    
     return True
 
 
@@ -143,7 +145,7 @@ def run_command(command: str, output: bool=False):
 
 
 def restart_component():
-    st.markdown(f"GraphRAG Kit:`{config.app_version}` GraphRAG:`{config.graphrag_version}` App started at: `{config.app_started_at}`")
+    st.markdown(f"[GraphRAG Kit](https://github.com/TheodoreNiu/graphrag_kit):`{config.app_version}` [GraphRAG](https://github.com/microsoft/graphrag):`{config.graphrag_version}` App started at: `{config.app_started_at}`")
     
     if config.app_tip:
         st.write(config.app_tip)
