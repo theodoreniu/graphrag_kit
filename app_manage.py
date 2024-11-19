@@ -34,38 +34,36 @@ def page():
 
 
 if __name__ == "__main__":
-    try:
-        page_title = "GraphRAG Manage"
-        st.set_page_config(
-            page_title=page_title,
-                            page_icon="avatars/favicon.ico",
-                            layout="wide",
-                            initial_sidebar_state='expanded')
-        st.image("avatars/logo.svg", width=100)
-        st.title(page_title)
-        
-        if not os.path.exists('./config.yaml'):
-            page()
-        else:
-            with open('./config.yaml') as file:
-                yaml_config = yaml.load(file, Loader=SafeLoader)
-                authenticator = stauth.Authenticate(
-                    yaml_config['credentials'],
-                    yaml_config['cookie']['name'],
-                    yaml_config['cookie']['key'],
-                    yaml_config['cookie']['expiry_days'],
-                )
-                
-                authenticator.login()
 
-                if st.session_state['authentication_status']:
-                    st.write(f'Welcome `{st.session_state["name"]}`')
-                    authenticator.logout()
-                    st.markdown("-----------------")
-                    page()
-                elif st.session_state['authentication_status'] is False:
-                    st.error('Username/password is incorrect')
-                elif st.session_state['authentication_status'] is None:
-                    st.warning('Please enter your username and password')
-    except Exception as e:
-        st.error(e)
+    page_title = "GraphRAG Manage"
+    st.set_page_config(
+        page_title=page_title,
+                        page_icon="avatars/favicon.ico",
+                        layout="wide",
+                        initial_sidebar_state='expanded')
+    st.image("avatars/logo.svg", width=100)
+    st.title(page_title)
+    
+    if not os.path.exists('./config.yaml'):
+        page()
+    else:
+        with open('./config.yaml') as file:
+            yaml_config = yaml.load(file, Loader=SafeLoader)
+            authenticator = stauth.Authenticate(
+                yaml_config['credentials'],
+                yaml_config['cookie']['name'],
+                yaml_config['cookie']['key'],
+                yaml_config['cookie']['expiry_days'],
+            )
+            
+            authenticator.login()
+
+            if st.session_state['authentication_status']:
+                st.write(f'Welcome `{st.session_state["name"]}`')
+                authenticator.logout()
+                st.markdown("-----------------")
+                page()
+            elif st.session_state['authentication_status'] is False:
+                st.error('Username/password is incorrect')
+            elif st.session_state['authentication_status'] is None:
+                st.warning('Please enter your username and password')

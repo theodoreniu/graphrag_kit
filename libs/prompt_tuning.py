@@ -6,7 +6,7 @@ import streamlit as st
 
 import graphrag.api as api
 
-from graphrag.config import load_config
+from graphrag.config.load_config import load_config
 
 
 async def start(base_path:str):

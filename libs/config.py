@@ -5,8 +5,8 @@ from datetime import datetime
 
 load_dotenv()
 
-app_version = "0.0.7"
-graphrag_version = "0.4.1"
+app_version = "0.0.8"
+graphrag_version = "0.5.0"
 app_started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 app_name = os.getenv('APP_NAME', 'graphrag')
 app_tip = os.getenv('APP_TIP', '')
@@ -44,9 +44,6 @@ ai_search_key = os.getenv('AI_SEARCH_KEY', '')
 
 di_url = os.getenv('DOCUMENT_INTELLIGENCE_URL', '')
 di_key = os.getenv('DOCUMENT_INTELLIGENCE_KEY', '')
-
-disable_pgvector = os.getenv('DISABLE_PGVECTOR', False)
-disable_aisearch = os.getenv('DISABLE_AI_SEARCH', False)
 
 generate_data_vision = 'GPT Vision'
 generate_data_vision_txt = 'GPT Vision (as text)'

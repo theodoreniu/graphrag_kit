@@ -1,15 +1,13 @@
 
 import json
 import os
-import re
 import streamlit as st
 from dotenv import load_dotenv
 import io
-from libs.render_context import get_real_response, render_context_data_global, render_context_data_local, render_response
+from libs.render_context import get_real_response, render_context_data_drift, render_context_data_global, render_context_data_local, render_response
 from libs.save_settings import set_settings
 from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_rag_versions, project_path, restart_component, set_cache_json_to_file
 from libs.set_prompt import improve_query
-from libs.store_vector import AI_SEARCH, PG
 import pandas as pd
 import libs.config as config
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
@@ -51,25 +49,22 @@ def page():
     
     rag_versions_list = get_rag_versions()
     if len(rag_versions_list) == 0:
-        st.error("No projects found.")
+        st.error("No projects found, please go to manage page to create a project.")
         return
 
     st.markdown("### Select Project to Test")
 
-    options = []
-    if not config.disable_pgvector:
-        options.append(PG)
-    if not config.disable_aisearch:
-        options.append(AI_SEARCH)
-
-    c1, c2 = st.columns([1, 1])
+    c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
         project_name = st.selectbox("Project", rag_versions_list)
     with c2:
         community_level = st.text_input("community_level", value=2)
+    with c3:
+        response_type = st.selectbox("Response Type", ["Multiple Paragraphs", "Single Paragraph"])
     
     st.session_state['project_name'] = project_name
     st.session_state['community_level'] = community_level
+    st.session_state['response_type'] = response_type
     
     # project settings review
     st.write(f"You selected: `{project_name}`")
@@ -88,8 +83,10 @@ def page():
                          placeholder="Input your query here",
                          value="")
     
-    tab1, tab2, tab3 = st.tabs(["Local Search", "Global Search", "Drift Search"])
+    tab1, tab2, tab3 = st.tabs(["🛢️ Local Search", "🌍 Global Search", "🌀 Drift Search"])
+    
     with tab1:
+        st.markdown("About Local Search: https://microsoft.github.io/graphrag/query/local_search/")
         if st.button('🔎 Local Search', key="local_search"):
             if not query:
                 st.error("Please enter a query")
@@ -99,15 +96,17 @@ def page():
                         root_dir=project_path(project_name),
                         query=query,
                         community_level=int(community_level),
-                        response_type="Multiple Paragraphs",
+                        response_type=response_type,
                         streaming=False,
                         config_filepath=None,
                         data_dir=None,
                     )
                     render_response(response)
                     render_context_data_local(context_data)
-        st.markdown("About Local Search: https://microsoft.github.io/graphrag/query/local_search/")
+    
     with tab2:
+        st.markdown("About Global Search: https://microsoft.github.io/graphrag/query/global_search/")
+        dynamic_community_selection = st.checkbox("Dynamic Community Selection", value=False)
         if st.button('🔎 Global Search', key="global_search"):
             if not query:
                 st.error("Please enter a query")
@@ -117,15 +116,17 @@ def page():
                         root_dir=project_path(project_name),
                         query=improve_query(project_name, query),
                         community_level=int(community_level),
-                        response_type="Multiple Paragraphs",
+                        response_type=response_type,
                         streaming=False,
                         config_filepath=None,
                         data_dir=None,
+                        dynamic_community_selection=dynamic_community_selection
                     )
                     render_response(response)
                     render_context_data_global(context_data)
-        st.markdown("About Global Search: https://microsoft.github.io/graphrag/query/global_search/")
+    
     with tab3:
+        st.markdown("About DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
         if st.button('🔎 Drift Search', key="run_drift_search"):
             if not query:
                 st.error("Please enter a query")
@@ -141,8 +142,8 @@ def page():
                         data_dir=None,
                     )
                     render_response(response)
-        st.markdown("About DRIFT Search: https://microsoft.github.io/graphrag/query/drift_search/")
-
+                    render_context_data_drift(context_data)
+        
     st.markdown("-----------------")
     st.markdown("## Batch Test")
     
@@ -214,6 +215,7 @@ def page():
                     st.success(f"GraphRAG (chars {len(result)}): {response}")
                     modified_df.at[index, f"{project_name}_response_count"] = len(result)
                     modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
+                    modified_df.at[index, f"{project_name}_response_type"] = response_type
                     if enable_print_context:
                         render_context_data_local(context_data)
             
@@ -248,38 +250,36 @@ def page():
 
 
 if __name__ == "__main__":
-    try:
-        page_title = "GraphRAG Test"
-        st.set_page_config(
-            page_title=page_title,
-                            page_icon="avatars/favicon.ico",
-                            layout="wide",
-                            initial_sidebar_state='expanded')
-        st.image("avatars/logo.svg", width=100)
-        st.title(page_title)
-        
-        if not os.path.exists('./config.yaml'):
-            page()
-        else:
-            with open('./config.yaml') as file:
-                yaml_config = yaml.load(file, Loader=SafeLoader)
-                authenticator = stauth.Authenticate(
-                    yaml_config['credentials'],
-                    yaml_config['cookie']['name'],
-                    yaml_config['cookie']['key'],
-                    yaml_config['cookie']['expiry_days'],
-                )
-                
-                authenticator.login()
+    page_title = "GraphRAG Test"
+    st.set_page_config(
+        page_title=page_title,
+                        page_icon="avatars/favicon.ico",
+                        layout="wide",
+                        initial_sidebar_state='expanded')
+    st.image("avatars/logo.svg", width=100)
+    st.title(page_title)
+    
+    if not os.path.exists('./config.yaml'):
+        page()
+    else:
+        with open('./config.yaml') as file:
+            yaml_config = yaml.load(file, Loader=SafeLoader)
+            authenticator = stauth.Authenticate(
+                yaml_config['credentials'],
+                yaml_config['cookie']['name'],
+                yaml_config['cookie']['key'],
+                yaml_config['cookie']['expiry_days'],
+            )
+            
+            authenticator.login()
 
-                if st.session_state['authentication_status']:
-                    st.write(f'Welcome `{st.session_state["name"]}`')
-                    authenticator.logout()
-                    st.markdown("-----------------")
-                    page()
-                elif st.session_state['authentication_status'] is False:
-                    st.error('Username/password is incorrect')
-                elif st.session_state['authentication_status'] is None:
-                    st.warning('Please enter your username and password')
-    except Exception as e:
-        st.error(e)
+            if st.session_state['authentication_status']:
+                st.write(f'Welcome `{st.session_state["name"]}`')
+                authenticator.logout()
+                st.markdown("-----------------")
+                page()
+            elif st.session_state['authentication_status'] is False:
+                st.error('Username/password is incorrect')
+            elif st.session_state['authentication_status'] is None:
+                st.warning('Please enter your username and password')
+
