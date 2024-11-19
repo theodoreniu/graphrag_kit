@@ -30,6 +30,7 @@ class Item(BaseModel):
     query: str
     rag_version: str
     community_level: int = 2
+    dynamic_community_selection: bool = False
 
 
 # -----------------------------------------------------------------
@@ -76,6 +77,7 @@ def global_search(item: Item, api_key: str=Header(...)):
                     query=improve_query(item.rag_version, item.query),
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
+                    dynamic_community_selection=bool(item.dynamic_community_selection),
                     streaming=False,
                     config_filepath=None,
                     data_dir=None,
