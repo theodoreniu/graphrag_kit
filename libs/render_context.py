@@ -23,7 +23,8 @@ def render_context_data_local(context_data:dict):
     df = pd.DataFrame(context_data['relationships'])
     tab3.markdown(f"Items: `{len(df)}`")
     df["weight"] = pd.to_numeric(df["weight"], errors='coerce')
-    df["links"] = pd.to_numeric(df["links"], errors='coerce')
+    if 'links' in df:
+        df["links"] = pd.to_numeric(df["links"], errors='coerce')
     df = df.sort_values(by="weight", ascending=False) 
     tab3.dataframe(df, use_container_width=True)
     
