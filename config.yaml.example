@@ -1,6 +1,6 @@
 credentials:
   usernames:
-    graphrag: # can see all projects
+    admin: # can see all projects
       email: admin@gmail.com
       name: GraphRAG Admin
       password: abc

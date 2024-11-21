@@ -60,9 +60,9 @@ def debug(data:any, title:str=""):
 def is_admin():
     if not os.path.exists('./config.yaml'):
         return True
-    
-    if st.session_state['authentication_status']:
-        return st.session_state['username'] == config.app_name
+
+    if 'authentication_status' in st.session_state and st.session_state['authentication_status']:
+        return st.session_state['username'].lower() == 'admin'
     
     return True
 
