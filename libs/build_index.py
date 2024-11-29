@@ -1,14 +1,11 @@
-
-
 import asyncio
 import time
+
+import graphrag.api as api
 import streamlit as st
 from graphrag.index.emit.types import TableEmitterType
-from libs.common import run_command, load_graphrag_config
-import graphrag.api as api
-import time
-import streamlit as st
 
+from libs.common import run_command, load_graphrag_config
 from libs.progress import PrintProgressReporter
 
 
@@ -30,8 +27,6 @@ def build_index(project_name: str):
                     progress_reporter=progress_reporter,
                     emit=[TableEmitterType.Parquet],
                 ))
-
-
 
     st.markdown("----------------------------")
     

@@ -4,8 +4,8 @@ import os
 import libs.config as config
 
 
-def improve_query(rag_version: str, query: str):
-    prompt = get_prompt(rag_version)
+def improve_query(project_name: str, query: str):
+    prompt = get_prompt(project_name)
     if not prompt:
         return query
 
@@ -17,8 +17,8 @@ def improve_query(rag_version: str, query: str):
     return prompt
 
 
-def get_prompt(rag_version: str):
-    prompt_txt = f"/app/projects/{rag_version}/prompts/prompt.txt"
+def get_prompt(project_name: str):
+    prompt_txt = f"/app/projects/{project_name}/prompts/prompt.txt"
     if not os.path.exists(prompt_txt):
         return """-Your Role-
 You are an intelligent assistant.
@@ -36,17 +36,17 @@ def check_prompt(content:str):
         return False
     return True
 
-def set_prompt(rag_version: str):
-    prompt_txt = f"/app/projects/{rag_version}/prompts/prompt.txt"
+def set_prompt(project_name: str):
+    prompt_txt = f"/app/projects/{project_name}/prompts/prompt.txt"
 
-    prompt = get_prompt(rag_version)
+    prompt = get_prompt(project_name)
 
     new_prompt = st.text_area("Prompt", 
                               value=prompt, 
                               height=400,
-                              key=f"prompt_{rag_version}")
+                              key=f"prompt_{project_name}")
 
-    if st.button("Save", key=f"save_{rag_version}"):
+    if st.button("Save", key=f"save_{project_name}"):
         if not check_prompt(new_prompt):
             st.error("Prompt must contain {query}")
             return

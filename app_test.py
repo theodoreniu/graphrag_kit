@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import io
 from libs.render_context import get_real_response, render_context_data_drift, render_context_data_global, render_context_data_local, render_response
 from libs.save_settings import set_settings
-from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_rag_versions, project_path, restart_component, set_cache_json_to_file
+from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_project_names, project_path, restart_component, set_cache_json_to_file
 from libs.set_prompt import improve_query
 import pandas as pd
 import libs.config as config
@@ -46,9 +46,9 @@ def response_score(query:str, standard_answer:str, generated_answer:str):
 
 def page():
     restart_component()
-    
-    rag_versions_list = get_rag_versions()
-    if len(rag_versions_list) == 0:
+
+    project_names = get_project_names()
+    if len(project_names) == 0:
         st.error("No projects found, please go to manage page to create a project.")
         return
 
@@ -56,7 +56,7 @@ def page():
 
     c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
-        project_name = st.selectbox("Project", rag_versions_list)
+        project_name = st.selectbox("Project", project_names)
     with c2:
         community_level = st.text_input("community_level", value=2)
     with c3:

@@ -28,7 +28,7 @@ app.add_middleware(
 
 class Item(BaseModel):
     query: str
-    rag_version: str
+    project_name: str
     community_level: int = 2
     dynamic_community_selection: bool = False
 
@@ -40,11 +40,11 @@ def local_search(item: Item, api_key: str=Header(...)):
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
         
-        # set_venvs(item.rag_version)
+        # set_venvs(item.project_name)
         
         (response, context_data) = run_local_search(
-                    root_dir=project_path(item.rag_version),
-                    query=improve_query(item.rag_version, item.query),
+                    root_dir=project_path(item.project_name),
+                    query=improve_query(item.project_name, item.query),
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
                     streaming=False,
@@ -70,11 +70,11 @@ def global_search(item: Item, api_key: str=Header(...)):
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
         
-        # set_venvs(item.rag_version)
+        # set_venvs(item.project_name)
 
         (response, context_data) = run_global_search(
-                    root_dir=project_path(item.rag_version),
-                    query=improve_query(item.rag_version, item.query),
+                    root_dir=project_path(item.project_name),
+                    query=improve_query(item.project_name, item.query),
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
                     dynamic_community_selection=bool(item.dynamic_community_selection),
@@ -100,11 +100,11 @@ def global_search(item: Item, api_key: str=Header(...)):
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
         
-        # set_venvs(item.rag_version)
+        # set_venvs(item.project_name)
 
         (response, context_data) = run_drift_search(
-                    root_dir=project_path(item.rag_version),
-                    query=improve_query(item.rag_version, item.query),
+                    root_dir=project_path(item.project_name),
+                    query=improve_query(item.project_name, item.query),
                     community_level=int(item.community_level),
                     streaming=False,
                     config_filepath=None,
