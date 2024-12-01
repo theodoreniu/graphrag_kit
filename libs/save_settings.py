@@ -34,24 +34,27 @@ def setting_editor(project_name: str, file_path: str, default_value: str="", lan
     settings_file = f"/app/projects/{project_name}/{file_path}"
 
     settings = get_setting_file(settings_file, default_value)
-        
-    new_settings = st_ace(settings,
-                   theme="chaos",
-                   language=language,
-                   height=400,
-                   auto_update=True,
-                   wrap=True,
-                   show_gutter=True,
-                   readonly=read_only,
-                   show_print_margin=True,
-                   key=f"{project_name}-{file_path}")
     
-    if read_only == False and st.button("Save", key=f"{project_name}-{file_path}-btn", icon="💾"):
-        with open(settings_file, 'w') as f:
-            f.write(new_settings)
-        st.success(f"Settings saved: {file_path}")
-
-    if read_only == False and st.button("Restore", key=f"{project_name}-{file_path}-btn-restore", icon="🔄"):
+    try:
+        new_settings = st_ace(settings,
+                    theme="chaos",
+                    language=language,
+                    height=400,
+                    auto_update=True,
+                    wrap=True,
+                    show_gutter=True,
+                    readonly=read_only,
+                    show_print_margin=True,
+                    key=f"{project_name}-{file_path}")
+        
+        if not read_only and st.button("Save", key=f"{project_name}-{file_path}-btn", icon="💾"):
+            with open(settings_file, 'w') as f:
+                f.write(new_settings)
+            st.success(f"Settings saved: {file_path}")
+    except Exception as e:
+        st.error(f"Error: {e}")
+    
+    if not read_only and st.button("Restore", key=f"{project_name}-{file_path}-btn-restore", icon="🔄"):
         with open(settings_file, 'w') as f:
             f.write(default_value)
         st.success(f"Settings restored: {file_path}, please refresh the page.")
