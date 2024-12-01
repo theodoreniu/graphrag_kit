@@ -4,6 +4,7 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import io
+from libs.find_sources import get_query_sources
 from libs.render_context import get_real_response, render_context_data_drift, render_context_data_global, render_context_data_local, render_response
 from libs.save_settings import set_settings
 from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_project_names, project_path, restart_component, set_cache_json_to_file
@@ -101,6 +102,9 @@ def page():
                         data_dir=None,
                     )
                     render_response(response)
+                    with st.expander("📄 Sources"):
+                        sources = get_query_sources(project_name, context_data)
+                        st.write(sources)
                     render_context_data_local(context_data)
     
     with tab2:
