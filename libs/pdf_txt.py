@@ -220,6 +220,8 @@ def save_pdf_pages_as_images(pdf_path:str, project_name:str, pdf_vision_option: 
     os.makedirs(base_dir, exist_ok=True)
 
     doc = fitz.open(pdf_path)
+    
+    upload_file(project_name, pdf_path)
 
     def process_page(page_num):
         pt = PageTask(doc, pdf_path, project_name, pdf_vision_option, page_num)

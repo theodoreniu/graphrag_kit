@@ -62,15 +62,6 @@ def set_local_search_cache(item: Item, result: any):
 
 
 # -----------------------------------------------------------------
-@app.get("/api/pdf_cache")
-def get_static_file(project_name: str, file_name: str):
-    local_file_path = f"/app/projects/{project_name}/pdf_cache/{file_name}"
-    if not os.path.exists(local_file_path):
-        raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(local_file_path)
-
-
-# -----------------------------------------------------------------
 @app.post("/api/local_search")
 def local_search(item: Item, api_key: str=Header(...)):
     try:
@@ -94,6 +85,7 @@ def local_search(item: Item, api_key: str=Header(...)):
         result = {
                 "message": "ok",
                 "response": response,
+                "query": item.query,
             }
         
         if item.query_source:
@@ -132,6 +124,7 @@ def global_search(item: Item, api_key: str=Header(...)):
         result = {
                 "message": "ok",
                 "response": response,
+                "query": item.query,
             }
         
         if item.context_data:
@@ -162,6 +155,7 @@ def global_search(item: Item, api_key: str=Header(...)):
         result = {
                 "message": "ok",
                 "response": response,
+                "query": item.query,
             }
 
         if item.context_data:
