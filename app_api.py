@@ -7,6 +7,9 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import libs.config as config
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(
     title="GraphRAG Kit API",
@@ -33,6 +36,7 @@ class Item(BaseModel):
     dynamic_community_selection: bool = False
     query_source: bool = False
     user_cache: bool = False
+    context_data: bool = False
 
 
 local_search_cache = {}
@@ -90,11 +94,13 @@ def local_search(item: Item, api_key: str=Header(...)):
         result = {
                 "message": "ok",
                 "response": response,
-                "context_data": context_data,
             }
         
         if item.query_source:
             result['sources'] = get_query_sources(item.project_name, context_data)
+        
+        if item.context_data:
+            result['context_data'] = context_data
         
         set_local_search_cache(item, result)
         
@@ -123,11 +129,15 @@ def global_search(item: Item, api_key: str=Header(...)):
                     data_dir=None,
                 )
 
-        return {
+        result = {
                 "message": "ok",
                 "response": response,
-                "context_data": context_data,
             }
+        
+        if item.context_data:
+            result['context_data'] = context_data
+        
+        return result
     except Exception as e:
         return {
                 "error": str(e),
@@ -149,11 +159,15 @@ def global_search(item: Item, api_key: str=Header(...)):
                     data_dir=None,
                 )
 
-        return {
+        result = {
                 "message": "ok",
                 "response": response,
-                "context_data": context_data,
             }
+
+        if item.context_data:
+            result['context_data'] = context_data
+        
+        return result
     except Exception as e:
         return {
                 "error": str(e),
