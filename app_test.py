@@ -104,7 +104,11 @@ def page():
                     render_response(response)
                     with st.expander("📄 Sources"):
                         sources = get_query_sources(project_name, context_data)
-                        st.write(sources)
+                        for source in sources:
+                            screenshot_sas_url = source['screenshot_sas_url']
+                            if screenshot_sas_url:
+                                st.image(screenshot_sas_url, width=500)
+                            st.write(source)
                     render_context_data_local(context_data)
     
     with tab2:
