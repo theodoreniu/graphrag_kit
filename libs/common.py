@@ -21,21 +21,21 @@ def load_graphrag_config(project_name: str):
     return load_config(root_dir=project_path(project_name))
 
 
-def set_venvs(rag_version: str):
-    os.environ['GRAPHRAG_ENTITY_EXTRACTION_PROMPT_FILE'] = str(Path("/app/projects") / rag_version / "prompts" / "entity_extraction.txt")
-    os.environ['GRAPHRAG_COMMUNITY_REPORT_PROMPT_FILE'] = f"/app/projects/{rag_version}/prompts/community_report.txt"
-    os.environ['GRAPHRAG_SUMMARIZE_DESCRIPTIONS_PROMPT_FILE'] = f"/app/projects/{rag_version}/prompts/summarize_descriptions.txt"
+def set_venvs(project_name: str):
+    os.environ['GRAPHRAG_ENTITY_EXTRACTION_PROMPT_FILE'] = str(Path("/app/projects") / project_name / "prompts" / "entity_extraction.txt")
+    os.environ['GRAPHRAG_COMMUNITY_REPORT_PROMPT_FILE'] = f"/app/projects/{project_name}/prompts/community_report.txt"
+    os.environ['GRAPHRAG_SUMMARIZE_DESCRIPTIONS_PROMPT_FILE'] = f"/app/projects/{project_name}/prompts/summarize_descriptions.txt"
 
 
-def check_rag_complete(rag_version: str):
-    base_path = f"/app/projects/{rag_version}"
+def check_rag_complete(project_name: str):
+    base_path = f"/app/projects/{project_name}"
     subdirectories = list_subdirectories(path=f"{base_path}/output")
     if len(subdirectories) == 0:
         raise Exception("Your need to build index first.")
 
 
-def get_original_dir(rag_version: str):
-    return f"/app/projects/{rag_version}/original"
+def get_original_dir(project_name: str):
+    return f"/app/projects/{project_name}/original"
 
 
 def list_files_and_sizes(directory: str):
@@ -73,7 +73,7 @@ def get_username():
     return config.app_name
 
 
-def format_rag_version(version: str):
+def format_project_name(version: str):
     if not re.match("^[A-Za-z0-9_-]*$", version):
         raise ValueError("Name can only contain letters and numbers.")
     
@@ -83,24 +83,24 @@ def format_rag_version(version: str):
     return f'{get_username()}_{version.lower()}'
 
 
-def delete_rag_version(version: str):
-    run_command(f"rm -rf /app/projects/{version}")
-    st.success(f"Deleted {version}")
+def delete_project_name(project_name: str):
+    run_command(f"rm -rf /app/projects/{project_name}")
+    st.success(f"Deleted {project_name}")
 
 
-def rag_version_exists(version: str):
-    version_path = f'/app/projects/{version}'
-    return os.path.exists(version_path)
+def project_name_exists(project_name: str):
+    project_path = f'/app/projects/{project_name}'
+    return os.path.exists(project_path)
 
 
-def get_rag_versions():
-    version_path = '/app/projects'
-    debug(f"scan to find versions in {version_path}")
-    versions = list_subdirectories(version_path)
+def get_project_names():
+    project_name_path = '/app/projects'
+    debug(f"scan to find versions in {project_name_path}")
+    projects = list_subdirectories(project_name_path)
     if is_admin():
-        return versions
+        return projects
     
-    return [v for v in versions if v.startswith(get_username())]
+    return [v for v in projects if v.startswith(get_username())]
 
 
 def javascript_code():

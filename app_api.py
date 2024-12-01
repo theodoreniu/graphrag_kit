@@ -1,11 +1,11 @@
+import os
 from fastapi.responses import FileResponse
+from libs.find_sources import get_query_sources
 from libs.common import project_path
-from libs.set_prompt import improve_query
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import libs.config as config
-import os
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
 
 app = FastAPI(
@@ -28,9 +28,42 @@ app.add_middleware(
 
 class Item(BaseModel):
     query: str
-    rag_version: str
+    project_name: str
     community_level: int = 2
     dynamic_community_selection: bool = False
+    query_source: bool = False
+    user_cache: bool = False
+
+
+local_search_cache = {}
+local_search_cache_limit = 20
+
+
+def get_local_search_cache(item: Item):
+    if not item.user_cache:
+        return None
+    
+    if item.query in local_search_cache:
+        return local_search_cache[item.query]
+    return None
+
+
+def set_local_search_cache(item: Item, result: any):
+    if not item.user_cache:
+        return
+    
+    if len(local_search_cache) >= local_search_cache_limit:
+        local_search_cache.pop(list(local_search_cache.keys())[0])
+    local_search_cache[item.query] = result
+
+
+# -----------------------------------------------------------------
+@app.get("/api/pdf_cache")
+def get_static_file(project_name: str, file_name: str):
+    local_file_path = f"/app/projects/{project_name}/pdf_cache/{file_name}"
+    if not os.path.exists(local_file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(local_file_path)
 
 
 # -----------------------------------------------------------------
@@ -40,11 +73,13 @@ def local_search(item: Item, api_key: str=Header(...)):
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
         
-        # set_venvs(item.rag_version)
+        cached_result = get_local_search_cache(item)
+        if cached_result:
+            return cached_result
         
         (response, context_data) = run_local_search(
-                    root_dir=project_path(item.rag_version),
-                    query=improve_query(item.rag_version, item.query),
+                    root_dir=project_path(item.project_name),
+                    query=item.query,
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
                     streaming=False,
@@ -52,11 +87,18 @@ def local_search(item: Item, api_key: str=Header(...)):
                     data_dir=None,
                 )
 
-        return {
+        result = {
                 "message": "ok",
                 "response": response,
-                "context_data": context_data
+                "context_data": context_data,
             }
+        
+        if item.query_source:
+            result['sources'] = get_query_sources(item.project_name, context_data)
+        
+        set_local_search_cache(item, result)
+        
+        return result
     except Exception as e:
         return {
                 "error": str(e),
@@ -69,12 +111,10 @@ def global_search(item: Item, api_key: str=Header(...)):
     try:
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
-        
-        # set_venvs(item.rag_version)
 
         (response, context_data) = run_global_search(
-                    root_dir=project_path(item.rag_version),
-                    query=improve_query(item.rag_version, item.query),
+                    root_dir=project_path(item.project_name),
+                    query=item.query,
                     community_level=int(item.community_level),
                     response_type="Multiple Paragraphs",
                     dynamic_community_selection=bool(item.dynamic_community_selection),
@@ -86,7 +126,7 @@ def global_search(item: Item, api_key: str=Header(...)):
         return {
                 "message": "ok",
                 "response": response,
-                "context_data": context_data
+                "context_data": context_data,
             }
     except Exception as e:
         return {
@@ -99,12 +139,10 @@ def global_search(item: Item, api_key: str=Header(...)):
     try:
         if config.api_key != api_key:
             raise Exception("Invalid api-key")
-        
-        # set_venvs(item.rag_version)
 
         (response, context_data) = run_drift_search(
-                    root_dir=project_path(item.rag_version),
-                    query=improve_query(item.rag_version, item.query),
+                    root_dir=project_path(item.project_name),
+                    query=item.query,
                     community_level=int(item.community_level),
                     streaming=False,
                     config_filepath=None,
@@ -114,7 +152,7 @@ def global_search(item: Item, api_key: str=Header(...)):
         return {
                 "message": "ok",
                 "response": response,
-                "context_data": context_data
+                "context_data": context_data,
             }
     except Exception as e:
         return {

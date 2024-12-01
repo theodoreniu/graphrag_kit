@@ -12,6 +12,5 @@ if [ -z "$APP_NAME" ]; then
 fi
 
 export DOCKER_FILE="Dockerfile.api"
-export MIN_REPLICAS="0"
 
 bash deploy.sh "${APP_NAME}-api"

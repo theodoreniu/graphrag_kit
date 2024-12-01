@@ -1,167 +1,62 @@
 import streamlit as st
 import os
-from libs.set_prompt import check_prompt
 from streamlit_ace import st_ace
+import libs.config as config
+
+from graphrag.prompts.index.claim_extraction import CLAIM_EXTRACTION_PROMPT
+from graphrag.prompts.index.community_report import (
+    COMMUNITY_REPORT_PROMPT,
+)
+from graphrag.prompts.index.entity_extraction import GRAPH_EXTRACTION_PROMPT
+from graphrag.prompts.index.summarize_descriptions import SUMMARIZE_PROMPT
+from graphrag.prompts.query.drift_search_system_prompt import DRIFT_LOCAL_SYSTEM_PROMPT
+from graphrag.prompts.query.global_search_knowledge_system_prompt import (
+    GENERAL_KNOWLEDGE_INSTRUCTION,
+)
+from graphrag.prompts.query.global_search_map_system_prompt import MAP_SYSTEM_PROMPT
+from graphrag.prompts.query.global_search_reduce_system_prompt import (
+    REDUCE_SYSTEM_PROMPT,
+)
+from graphrag.prompts.query.local_search_system_prompt import LOCAL_SEARCH_SYSTEM_PROMPT
+from graphrag.prompts.query.question_gen_system_prompt import QUESTION_SYSTEM_PROMPT
 
 
-def get_setting_file(file_path: str):
+def get_setting_file(file_path: str, default_prompt: str=""):
     if not os.path.exists(file_path):
-        return ""
+        return default_prompt
     
     with open(file_path, 'r') as f:
         prompt = f.read()
         return prompt
 
 
-def settings(project_name: str, read_only: bool=False):
-    settings_file = f"/app/projects/{project_name}/settings.yaml"
+def setting_editor(project_name: str, file_path: str, default_value: str="", language='yaml', read_only: bool=False):
+    settings_file = f"/app/projects/{project_name}/{file_path}"
 
-    settings = get_setting_file(settings_file)        
+    settings = get_setting_file(settings_file, default_value)
+        
     new_settings = st_ace(settings,
                    theme="chaos",
-                   language='yaml',
+                   language=language,
                    height=400,
                    auto_update=True,
                    wrap=True,
                    show_gutter=True,
                    readonly=read_only,
                    show_print_margin=True,
-                   key=f"settings_{project_name}")
+                   key=f"{project_name}-{file_path}")
     
-    if read_only == False and st.button("Save", key=f"save_settings_{project_name}", icon="💾"):
+    if read_only == False and st.button("Save", key=f"{project_name}-{file_path}-btn", icon="💾"):
         with open(settings_file, 'w') as f:
             f.write(new_settings)
-            st.success("Settings saved.")
+        st.success(f"Settings saved: {file_path}")
 
-
-def claim_extraction(project_name: str, read_only: bool=False):
-    settings_file = f"/app/projects/{project_name}/prompts/claim_extraction.txt"
-
-    settings = get_setting_file(settings_file)        
-    new_settings = st_ace(settings,
-                   theme="chaos",
-                   language='plain_text',
-                   height=400,
-                   auto_update=True,
-                   wrap=True,
-                   show_gutter=True,
-                   readonly=read_only,
-                   show_print_margin=True,
-                   key=f"claim_extraction_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_claim_extraction_{project_name}", icon="💾"):
+    if read_only == False and st.button("Restore", key=f"{project_name}-{file_path}-btn-restore", icon="🔄"):
         with open(settings_file, 'w') as f:
-            f.write(new_settings)
-        st.success("Settings saved.")
+            f.write(default_value)
+        st.success(f"Settings restored: {file_path}, please refresh the page.")
 
-
-def community_report(project_name: str, read_only: bool=False):
-    settings_file = f"/app/projects/{project_name}/prompts/community_report.txt"
-
-    settings = get_setting_file(settings_file)        
-    new_settings = st_ace(settings,
-                   theme="chaos",
-                   language='plain_text',
-                   height=400,
-                   auto_update=True,
-                   wrap=True,
-                   show_gutter=True,
-                   readonly=read_only,
-                   show_print_margin=True,
-                   key=f"community_report_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_community_report_{project_name}", icon="💾"):
-        with open(settings_file, 'w') as f:
-            f.write(new_settings)
-        st.success("Settings saved.")
-
-
-def entity_extraction(project_name: str, read_only: bool=False):
-    settings_file = f"/app/projects/{project_name}/prompts/entity_extraction.txt"
-
-    settings = get_setting_file(settings_file)        
-    new_settings = st_ace(settings,
-                   theme="chaos",
-                   language='plain_text',
-                   height=400,
-                   auto_update=True,
-                   wrap=True,
-                   show_gutter=True,
-                   readonly=read_only,
-                   show_print_margin=True,
-                   key=f"entity_extraction_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_entity_extraction_{project_name}", icon="💾"):
-        with open(settings_file, 'w') as f:
-            f.write(new_settings)
-        st.success("Settings saved.")
-
-
-def summarize_descriptions(project_name: str, read_only: bool=False):
-    settings_file = f"/app/projects/{project_name}/prompts/summarize_descriptions.txt"
-
-    settings = get_setting_file(settings_file)        
-    new_settings = st_ace(settings,
-                   theme="chaos",
-                   language='plain_text',
-                   height=400,
-                   auto_update=True,
-                   wrap=True,
-                   show_gutter=True,
-                   readonly=read_only,
-                   show_print_margin=True,
-                   key=f"summarize_descriptions_{project_name}")
-    if read_only == False and st.button("Save", key=f"save_summarize_descriptions_{project_name}", icon="💾"):
-        with open(settings_file, 'w') as f:
-            f.write(new_settings)
-        st.success("Settings saved.")
-
-
-def project_prompt_setting(project_name: str, read_only: bool=False):
-    settings_file = f"/app/projects/{project_name}/prompts/prompt.txt"
-
-    settings = get_setting_file(settings_file)        
-    new_settings = st_ace(settings,
-                   theme="chaos",
-                   language='plain_text',
-                   height=400,
-                   auto_update=True,
-                   wrap=True,
-                   show_gutter=True,
-                   show_print_margin=True,
-                   key=f"project_prompt_{project_name}")
-    if st.button("Save", key=f"save_project_prompt_{project_name}", icon="💾"):
-        if not check_prompt(new_settings):
-            st.error("Prompt must contain {query}")
-            return
-        with open(settings_file, 'w') as f:
-            f.write(new_settings)
-            st.success("Settings saved.")
-
-
-def set_settings(project_name: str, read_only=False):
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-        "📄 settings.yaml",
-        "📁 Input",
-        "📄 claim_extraction.txt",
-        "📄 community_report.txt",
-        "📄 entity_extraction.txt",
-        "📄 summarize_descriptions.txt",
-        "📄 prompt.txt",
-        ])
-    with tab1:
-        settings(project_name, read_only=read_only)
-    with tab2:
-        input_files(project_name)
-    with tab3:
-        claim_extraction(project_name, read_only=read_only)
-    with tab4:
-        community_report(project_name, read_only=read_only)
-    with tab5:
-        entity_extraction(project_name, read_only=read_only)
-    with tab6:
-        summarize_descriptions(project_name, read_only=read_only)
-    with tab7:
-        project_prompt_setting(project_name, read_only=read_only)
-
-
+        
 def input_files(project_name: str):
     files_path = f"/app/projects/{project_name}/input"
     if not os.path.exists(files_path):
@@ -169,3 +64,60 @@ def input_files(project_name: str):
     files = os.listdir(files_path)
     st.markdown(f"Items: `{len(files)}`")
     st.write(files)
+
+        
+def set_settings(project_name: str, read_only=False):
+    default_settings = ""
+    with open("/app/template/setting.yaml", "r") as t:
+        default_settings = t.read()
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15 = st.tabs([
+        "📄 settings.yaml",
+        "📁 Input",
+        
+        "📄 claim_extraction",
+        "📄 community_report",
+        "📄 entity_extraction",
+        "📄 summarize_descriptions",
+        
+        "📄 drift_search_system_prompt",
+        "📄 global_search_map_system_prompt",
+        "📄 global_search_reduce_system_prompt",
+        "📄 global_search_knowledge_system_prompt",
+        "📄 local_search_system_prompt",
+        "📄 question_gen_system_prompt",
+        
+        "📄 pdf_gpt_vision_prompt",
+        "📄 pdf_gpt_vision_prompt_by_text",
+        "📄 pdf_gpt_vision_prompt_by_image",
+        ])
+    with tab1:
+        setting_editor(project_name, "settings.yaml", default_value=default_settings, language='yaml', read_only=read_only)
+    with tab2:
+        input_files(project_name)
+    with tab3:
+        setting_editor(project_name, "prompts/claim_extraction.txt", default_value=CLAIM_EXTRACTION_PROMPT, language='plain_text', read_only=read_only)
+    with tab4:
+        setting_editor(project_name, "prompts/community_report.txt", default_value=COMMUNITY_REPORT_PROMPT, language='plain_text', read_only=read_only)
+    with tab5:
+        setting_editor(project_name, "prompts/entity_extraction.txt", default_value=GRAPH_EXTRACTION_PROMPT, language='plain_text', read_only=read_only)
+    with tab6:
+        setting_editor(project_name, "prompts/summarize_descriptions.txt", default_value=SUMMARIZE_PROMPT, language='plain_text', read_only=read_only)
+    with tab7:
+        setting_editor(project_name, "prompts/drift_search_system_prompt.txt", default_value=DRIFT_LOCAL_SYSTEM_PROMPT, language='plain_text', read_only=read_only)
+    with tab8:
+        setting_editor(project_name, "prompts/global_search_map_system_prompt.txt", default_value=MAP_SYSTEM_PROMPT, language='plain_text', read_only=read_only)
+    with tab9:
+        setting_editor(project_name, "prompts/global_search_reduce_system_prompt.txt", default_value=REDUCE_SYSTEM_PROMPT, language='plain_text', read_only=read_only)
+    with tab10:
+        setting_editor(project_name, "prompts/global_search_knowledge_system_prompt.txt", default_value=GENERAL_KNOWLEDGE_INSTRUCTION, language='plain_text', read_only=read_only)
+    with tab11:
+        setting_editor(project_name, "prompts/local_search_system_prompt.txt", default_value=LOCAL_SEARCH_SYSTEM_PROMPT, language='plain_text', read_only=read_only)
+    with tab12:
+        setting_editor(project_name, "prompts/question_gen_system_prompt.txt", default_value=QUESTION_SYSTEM_PROMPT, language='plain_text', read_only=read_only)
+    with tab13:
+        setting_editor(project_name, "prompts/pdf_gpt_vision_prompt.txt", default_value=config.pdf_gpt_vision_prompt, language='plain_text', read_only=read_only)
+    with tab14:
+        setting_editor(project_name, "prompts/pdf_gpt_vision_prompt_by_text.txt", default_value=config.pdf_gpt_vision_prompt_by_text, language='plain_text', read_only=read_only)
+    with tab15:
+        setting_editor(project_name, "prompts/pdf_gpt_vision_prompt_by_image.txt", default_value=config.pdf_gpt_vision_prompt_by_image, language='plain_text', read_only=read_only)
+

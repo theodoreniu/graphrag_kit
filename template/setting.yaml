@@ -153,6 +153,7 @@ snapshots:
   top_level_nodes: false
 
 local_search:
+  prompt: "prompts/local_search_system_prompt.txt"
   # text_unit_prop: 0.5
   # community_prop: 0.1
   # conversation_history_max_turns: 5

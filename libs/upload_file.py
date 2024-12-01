@@ -23,15 +23,15 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 
-def list_uploaded_files(container, rag_version: str):
-    files = list_files_and_sizes(get_original_dir(rag_version))
+def list_uploaded_files(container, project_name: str):
+    files = list_files_and_sizes(get_original_dir(project_name))
     if len(files) > 0:
         container = container.container(border=True)
         container.write(f"Files uploaded `{len(files)}`")
         container.write(files)
 
 
-def upload_file(rag_version: str):
+def upload_file(project_name: str):
     
     file_list_container = st.empty()
 
@@ -50,30 +50,30 @@ def upload_file(rag_version: str):
             ],
         accept_multiple_files=True,
         label_visibility="hidden",
-        key=f"file_uploader_{rag_version}",
+        key=f"file_uploader_{project_name}",
     )
     
-    if st.button("Delete all files", key=f"delete_all_files_{rag_version}", icon="🗑️"):
-        run_command(f"rm -rf /app/projects/{rag_version}/original/*")
+    if st.button("Delete all files", key=f"delete_all_files_{project_name}", icon="🗑️"):
+        run_command(f"rm -rf /app/projects/{project_name}/original/*")
         time.sleep(3)
         st.success("All files deleted.")
-        list_uploaded_files(file_list_container, rag_version)
+        list_uploaded_files(file_list_container, project_name)
     
-    list_uploaded_files(file_list_container, rag_version)
+    list_uploaded_files(file_list_container, project_name)
 
     if len(uploaded_files) > 0:
         debug(uploaded_files)
         
-        Path(f"/app/projects/{rag_version}/original").mkdir(parents=True, exist_ok=True)
-        Path(f"/app/projects/{rag_version}/input").mkdir(parents=True, exist_ok=True)
+        Path(f"/app/projects/{project_name}/original").mkdir(parents=True, exist_ok=True)
+        Path(f"/app/projects/{project_name}/input").mkdir(parents=True, exist_ok=True)
                 
         for uploaded_file in uploaded_files:
-            with open(f"/app/projects/{rag_version}/original/{uploaded_file.name}", "wb") as f:
+            with open(f"/app/projects/{project_name}/original/{uploaded_file.name}", "wb") as f:
                 f.write(uploaded_file.read())
                 # make file permissions to another user can write
-                os.chmod(f"/app/projects/{rag_version}/original/{uploaded_file.name}", 0o666)
+                os.chmod(f"/app/projects/{project_name}/original/{uploaded_file.name}", 0o666)
 
-        list_uploaded_files(file_list_container, rag_version)
+        list_uploaded_files(file_list_container, project_name)
         st.success('File uploaded successfully.')
 
 
