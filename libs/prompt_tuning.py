@@ -51,11 +51,11 @@ async def start(base_path:str):
         file.write(community_summarization_prompt.encode(encoding="utf-8", errors="strict"))
 
 
-def prompt_tuning(rag_version: str):
-    base_path = f"/app/projects/{rag_version}"
+def prompt_tuning(project_name: str):
+    base_path = f"/app/projects/{project_name}"
     
     st.warning("This operation will overwrite your following files, please proceed with caution: \n\n - prompts/entity_extraction.txt \n\n - prompts/summarize_descriptions.txt \n\n - prompts/community_report.txt")
     
-    if st.button('Start Tuning ', key=f"prompt_tuning_{rag_version}", icon="🚀"):
+    if st.button('Start Tuning ', key=f"prompt_tuning_{project_name}", icon="🚀"):
         with st.spinner("Running..."):
             asyncio.run(start(base_path))

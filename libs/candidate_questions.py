@@ -21,12 +21,12 @@ from libs.store_vector import get_embedding_store
 from graphrag.query.llm.base import BaseLLMCallback
 
 async def run_candidate_questions(
-        rag_version: str, 
+        project_name: str,
         db:str, 
         question_history: list[str],
         callbacks: list[BaseLLMCallback] | None = None,
         ):
-    input_dir = f"/app/projects/{rag_version}/output/artifacts"
+    input_dir = f"/app/projects/{project_name}/output/artifacts"
 
     # Load tables to dataframes
 
@@ -48,7 +48,7 @@ async def run_candidate_questions(
 
     # load description embeddings to an in-memory lancedb vectorstore
     # to connect to a remote db, specify url and port values.
-    embedding_store = get_embedding_store(db=db,rag_version=rag_version)
+    embedding_store = get_embedding_store(db=db,project_name=project_name)
 
     print(f"Entity count: {len(entity_df)}")
     entity_df.head()

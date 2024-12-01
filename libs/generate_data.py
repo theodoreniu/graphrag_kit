@@ -11,7 +11,7 @@ import os
 import streamlit as st
 from libs import config
 from libs.common import run_command
-from libs.config import generate_data_vision, generate_data_vision_txt, generate_data_vision_image, generate_data_vision_di
+from libs.config import generate_data_vision, generate_data_vision_txt, generate_data_vision_image, generate_data_vision_di, generate_data_vision_azure
 from theodoretools.url import url_to_name
 import libs.pdf_txt as pdf_txt
 
@@ -25,7 +25,7 @@ def create_zip(directory, output_path):
                     zipf.write(filepath, os.path.relpath(filepath, directory))
 
 
-def generate_data(rag_version: str):
+def generate_data(project_name: str):
     st.markdown(f"## Attention")
     st.markdown(f"- Do not process `txt` files")
     st.markdown(f"- `pdf` will be converted to `txt`")
@@ -38,14 +38,15 @@ def generate_data(rag_version: str):
         generate_data_vision,
         generate_data_vision_txt,
         generate_data_vision_image,
-        generate_data_vision_di
+        generate_data_vision_di,
+        generate_data_vision_azure
         ]
     pdf_vision_option = st.radio('Please select a method to process the PDF:',
-                                 key=f"db_{rag_version}",
+                                 key=f"db_{project_name}",
                                  options=options)
 
-    if st.button('Start Generate' , key=f"generate_btn_{rag_version}", icon="🚀"):
-        with st.container(border=True, key=f"generate_container_{rag_version}", height=400):
+    if st.button('Start Generate' , key=f"generate_btn_{project_name}", icon="🚀"):
+        with st.container(border=True, key=f"generate_container_{project_name}", height=400):
             with st.spinner(f"Processing ..."):
                 # print data model config
                 st.write(f"data_azure_api_base: `{config.data_azure_api_base}`")
@@ -54,64 +55,64 @@ def generate_data(rag_version: str):
                 st.write(f"data_azure_chat_model_id: `{config.data_azure_chat_model_id}`")
             
                 # 1. copy original files to input
-                for root, dirs, files in os.walk(f"/app/projects/{rag_version}/original"):
+                for root, dirs, files in os.walk(f"/app/projects/{project_name}/original"):
                     for file in files:
                         file_path = os.path.join(root, file)
-                        prepare_file(file_path, file, rag_version)
+                        prepare_file(file_path, file, project_name)
                 
                 # 2. convert files to txt
-                for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
+                for root, dirs, files in os.walk(f"/app/projects/{project_name}/input"):
                     for file in files:
                         file_path = os.path.join(root, file)
-                        convert_file(file_path, file, rag_version, pdf_vision_option)
+                        convert_file(file_path, file, project_name, pdf_vision_option)
 
                 #  3. make file permissions to another user can write
-                for root, dirs, files in os.walk(f"/app/projects/{rag_version}/input"):
+                for root, dirs, files in os.walk(f"/app/projects/{project_name}/input"):
                     for file in files:
                         file_path = os.path.join(root, file)
                         os.chmod(file_path, 0o666)
 
                 st.success("Data generated successfully.")
 
-    if st.button("Download generated files", key=f"downloads_input_files_{rag_version}", icon="💾"):
-        directory_to_zip = f'/app/projects/{rag_version}/input'
-        output_zip_path = f'/tmp/{rag_version}.zip'
+    if st.button("Download generated files", key=f"downloads_input_files_{project_name}", icon="💾"):
+        directory_to_zip = f'/app/projects/{project_name}/input'
+        output_zip_path = f'/tmp/{project_name}.zip'
         create_zip(directory_to_zip, output_zip_path)
         with open(output_zip_path, "rb") as f:
             st.download_button(
                 label="Download",
                 data=f,
-                file_name=f"{rag_version}.zip",
+                file_name=f"{project_name}.zip",
                 mime="application/zip"
             )
         
-    if st.button("Clear generated files", key=f"delete_all_input_files_{rag_version}", icon="🗑️"):
-        run_command(f"rm -rf /app/projects/{rag_version}/input/*")
+    if st.button("Clear generated files", key=f"delete_all_input_files_{project_name}", icon="🗑️"):
+        run_command(f"rm -rf /app/projects/{project_name}/input/*")
         time.sleep(3)
         st.success("All files deleted.")
 
-    if st.button("Clear PDF cached files", key=f"delete_all_cached_files_{rag_version}", icon="🗑️"):
-        run_command(f"rm -rf /app/projects/{rag_version}/pdf_cache/*")
+    if st.button("Clear PDF cached files", key=f"delete_all_cached_files_{project_name}", icon="🗑️"):
+        run_command(f"rm -rf /app/projects/{project_name}/pdf_cache/*")
         time.sleep(3)
         st.success("All files deleted.")
 
 
-def convert_file(file_path, file, rag_version, pdf_vision_option):
+def convert_file(file_path, file, project_name, pdf_vision_option):
     
     if file.endswith('.xlsx') or file.endswith('.csv'):
         st.write(f"converting `{file}`")
-        excel_to_txt(file_path, rag_version)
+        excel_to_txt(file_path, project_name)
 
     if file.endswith('.pdf'):
         st.write(f"converting `{file}`")
-        pdf_txt.save_pdf_pages_as_images(file_path, rag_version, pdf_vision_option)
+        pdf_txt.save_pdf_pages_as_images(file_path, project_name, pdf_vision_option)
     
 
-def excel_to_txt(file_path, rag_version):
+def excel_to_txt(file_path, project_name):
     file_name = os.path.basename(file_path)
     with open(file_path, "rb") as file:
         excel_data = pd.ExcelFile(file.read())
-        with open(f"/app/projects/{rag_version}/input/{file_name}.txt", 'w', encoding='utf-8') as f:
+        with open(f"/app/projects/{project_name}/input/{file_name}.txt", 'w', encoding='utf-8') as f:
             for sheet_name in excel_data.sheet_names:
                 f.write(f"{sheet_name}\n\n") 
                 df = excel_data.parse(sheet_name)
@@ -123,26 +124,26 @@ def excel_to_txt(file_path, rag_version):
                     f.write(f"\n\n") 
 
 
-def prepare_file(file_path, file, rag_version):
+def prepare_file(file_path, file, project_name):
     if file.endswith('.xlsx') or file.endswith('.csv'):
         if has_download_files(file_path):
-            download_files_from_xlsx_csv(file_path, file, rag_version)
+            download_files_from_xlsx_csv(file_path, file, project_name)
         else:
-            run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
+            run_command(f"cp -r '{file_path}' /app/projects/{project_name}/input/")
             st.write(f"copied {file} to input")
     if file.endswith('.txt'):
-        run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
+        run_command(f"cp -r '{file_path}' /app/projects/{project_name}/input/")
         st.write(f"copied {file} to input")
 
     if file.endswith('.md'):
-        run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/{file}.txt")
+        run_command(f"cp -r '{file_path}' /app/projects/{project_name}/input/{file}.txt")
         st.write(f"converted {file} to {file}.txt")
 
     if file.endswith('.pdf'):
-        run_command(f"cp -r '{file_path}' /app/projects/{rag_version}/input/")
+        run_command(f"cp -r '{file_path}' /app/projects/{project_name}/input/")
 
     # if file.endswith('.zip'):
-    #     deal_zip(file_path, rag_version)
+    #     deal_zip(file_path, project_name)
 
 
 def has_download_files(file_path: str):
@@ -158,7 +159,7 @@ def has_download_files(file_path: str):
     return False
 
 
-def download_files_from_xlsx_csv(file_path, file, rag_version):
+def download_files_from_xlsx_csv(file_path, file, project_name):
     if not file_path.endswith('.xlsx') and not file_path.endswith('.csv'):
         return
 
@@ -170,13 +171,13 @@ def download_files_from_xlsx_csv(file_path, file, rag_version):
             for index, row in df.iterrows():
                 if 'doc_url' in row:
                     doc_url = row['doc_url']
-                    download_file(doc_url, index, df_count, rag_version)
+                    download_file(doc_url, index, df_count, project_name)
 
 
-def download_file(doc_url, index, df_count, rag_version):
+def download_file(doc_url, index, df_count, project_name):
     file_name = url_to_name(doc_url)
-    os.makedirs(f"/app/projects/{rag_version}/input", exist_ok=True)     
-    file_path = os.path.join(f"/app/projects/{rag_version}/input", file_name)  
+    os.makedirs(f"/app/projects/{project_name}/input", exist_ok=True)
+    file_path = os.path.join(f"/app/projects/{project_name}/input", file_name)
 
     if os.path.exists(file_path):
         st.write(f"[{index}/{df_count}] File already exists: {file_path}")

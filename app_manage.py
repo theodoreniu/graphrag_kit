@@ -1,18 +1,15 @@
 import logging
 import sys
-import tracemalloc
 import streamlit as st
 import os
 from dotenv import load_dotenv
 from libs.save_env import set_envs
 from  libs.common import restart_component
-from libs.create_version import create_version
-from libs.versions_manage import versions_manage
+from libs.create_project import create_project
+from libs.projects_manage import projects_manage
 import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
-
-tracemalloc.start()
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -29,8 +26,8 @@ sys.path.append(grandparent_dir)
 def page():
     restart_component()
     set_envs()
-    create_version()
-    versions_manage()
+    create_project()
+    projects_manage()
 
 
 if __name__ == "__main__":

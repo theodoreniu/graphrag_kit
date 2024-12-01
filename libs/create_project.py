@@ -1,10 +1,9 @@
 import io
 import time
-from pathlib import Path
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from libs.common import format_rag_version, get_rag_versions, run_command
+from libs.common import format_project_name, get_project_names, run_command
 import libs.config as config
 from contextlib import redirect_stdout
 import asyncio
@@ -27,10 +26,10 @@ def initialize_project(path):
         loop.close()
 
 
-def overwrite_settings_yaml(root, new_rag_version):
+def overwrite_settings_yaml(root, new_project_name):
     settings_yaml = f"{root}/settings.yaml"
     template_settings_yaml = f"/app/template/setting.yaml"
-    container_name = f"{config.app_name}_{new_rag_version}"
+    container_name = f"{config.app_name}_{new_project_name}"
     with open(template_settings_yaml, "r") as t:
         with open(settings_yaml, "w") as f:
             new_settings_yaml = t.read().replace("container_name: default", f"container_name: {container_name}")
@@ -50,8 +49,8 @@ You are an intelligent assistant.
         f.write(template_prompt_txt)
 
 
-def create_version():
-    rag_versions_list = get_rag_versions()
+def create_project():
+    project_name_list = get_project_names()
     project_language_default = "No Specific"
     project_languages = [project_language_default, "Simplified Chinese", "English"]
     project_language = ""
@@ -60,20 +59,20 @@ def create_version():
     today_hour = time.strftime("%Y%m%d%H", time.localtime())
     c1, c2, c3 = st.columns(3)
     with c1:
-        new_rag_version = st.text_input("Please input name",
+        new_project_name = st.text_input("Please input name",
                                         value=today_hour,
                                         max_chars=30,
                                     )
     with c2:
-        rag_versions_list.insert(0, new_project_value)
-        copy_from_project_name = st.selectbox("Copy from", rag_versions_list, key="create_from_project_name")
+        project_name_list.insert(0, new_project_value)
+        copy_from_project_name = st.selectbox("Copy from", project_name_list, key="create_from_project_name")
     with c3:
         if copy_from_project_name == new_project_value:
             project_language = st.selectbox("Language", project_languages, key="project_language_select")
         
     btn = st.button("Create", key="confirm", icon="🚀")
     if btn:
-        formatted_project_name = format_rag_version(new_rag_version)
+        formatted_project_name = format_project_name(new_project_name)
         
         if check_project_exists(formatted_project_name):
             st.error(f"Project {formatted_project_name} already exists.")
@@ -94,31 +93,31 @@ def create_version():
             st.error(str(e))
 
 
-def modify_project_language(formatted_rag_version, project_language):
-    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+def modify_project_language(formatted_project_name, project_language):
+    modify_project_prompt(formatted_project_name=formatted_project_name,
                           file_name="claim_extraction.txt",
                           search_text="extract all entities that match the entity specification and all claims against those entities.",
                           type="claim",
                           project_language=project_language)
-    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+    modify_project_prompt(formatted_project_name=formatted_project_name,
                           file_name="community_report.txt",
                           search_text="technical capabilities, reputation, and noteworthy claims.",
                           type="community",
                           project_language=project_language)
-    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+    modify_project_prompt(formatted_project_name=formatted_project_name,
                           file_name="entity_extraction.txt",
                           search_text="identify all entities of those types from the text and all relationships among the identified entities.",
                           type="entity",
                           project_language=project_language)
-    modify_project_prompt(formatted_rag_version=formatted_rag_version,
+    modify_project_prompt(formatted_project_name=formatted_project_name,
                           file_name="summarize_descriptions.txt",
                           search_text="and include the entity names so we have the full context.",
                           type="entity",
                           project_language=project_language)
 
 
-def modify_project_prompt(formatted_rag_version, file_name, search_text, project_language, type):
-    prompt_file = f"/app/projects/{formatted_rag_version}/prompts/{file_name}"
+def modify_project_prompt(formatted_project_name, file_name, search_text, project_language, type):
+    prompt_file = f"/app/projects/{formatted_project_name}/prompts/{file_name}"
     if os.path.exists(prompt_file):
         with open(prompt_file, "r") as f:
             prompt_content = f.read()
@@ -129,11 +128,11 @@ def modify_project_prompt(formatted_rag_version, file_name, search_text, project
                 f.write(new_prompt_content)
 
 
-def check_project_exists(formatted_rag_version: str):
-    return os.path.exists(f"/app/projects/{formatted_rag_version}")
+def check_project_exists(formatted_project_name: str):
+    return os.path.exists(f"/app/projects/{formatted_project_name}")
 
 
-def copy_project(copy_from_project_name: str, formatted_rag_version: str):
-    run_command(f"cp -r '/app/projects/{copy_from_project_name}' '/app/projects/{formatted_rag_version}'")
-    st.success(f"Project {copy_from_project_name} copied to {formatted_rag_version}")
+def copy_project(copy_from_project_name: str, formatted_project_name: str):
+    run_command(f"cp -r '/app/projects/{copy_from_project_name}' '/app/projects/{formatted_project_name}'")
+    st.success(f"Project {copy_from_project_name} copied to {formatted_project_name}")
     time.sleep(3)
