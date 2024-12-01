@@ -2,6 +2,9 @@ import os
 import re
 import streamlit as st
 
+from libs.blob import get_sas_url
+
+
 def parse_file_info(input_string: str):
     match = re.match(r"(.*?\.pdf)_page_(\d+)\.png", input_string)
     if match:
@@ -40,10 +43,13 @@ def get_query_sources(project_name: str, context_data: any):
                     content = f.read()
                     if source['text'] in content:
                         pdf_file, screenshot_file, page_number = parse_file_info(txt_file)
+                        sas_url, sas_url_error = get_sas_url(project_name, screenshot_file)
                         sources.append({
                             "pdf_file": pdf_file,
                             "screenshot_file": screenshot_file,
                             "page_number": page_number,
+                            "sas_url": sas_url,
+                            "sas_url_error": sas_url_error
                         })
             except Exception as e:
                 st.error(f"Error parsing file info: {e}")
@@ -51,4 +57,3 @@ def get_query_sources(project_name: str, context_data: any):
         source_cache[source['text']] = True
                 
     return sources
-

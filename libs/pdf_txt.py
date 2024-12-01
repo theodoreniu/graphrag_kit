@@ -3,6 +3,7 @@ from openai import AzureOpenAI
 import os
 import base64
 import streamlit as st
+from libs.blob import upload_file
 from libs.save_settings import get_setting_file
 import libs.config as config
 import concurrent.futures
@@ -41,7 +42,7 @@ class PageTask:
         page = self.doc.load_page(self.page_num)
         pix = page.get_pixmap(dpi=150)
         pix.save(self.img_path)
-        return self.img_path
+        upload_file(self.project_name, self.img_path)
 
     def page_to_txt(self):
         page_txt = self.doc[self.page_num].get_text("text")
