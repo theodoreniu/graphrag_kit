@@ -7,7 +7,6 @@ import io
 from libs.render_context import get_real_response, render_context_data_drift, render_context_data_global, render_context_data_local, render_response
 from libs.save_settings import set_settings
 from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_project_names, project_path, restart_component, set_cache_json_to_file
-from libs.set_prompt import improve_query
 import pandas as pd
 import libs.config as config
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
@@ -114,7 +113,7 @@ def page():
                 with st.spinner('Generating ...'):
                     (response, context_data) = run_global_search(
                         root_dir=project_path(project_name),
-                        query=improve_query(project_name, query),
+                        query=query,
                         community_level=int(community_level),
                         response_type=response_type,
                         streaming=False,
@@ -135,7 +134,7 @@ def page():
                 with st.spinner('Generating ...'):
                     (response, context_data) = run_drift_search(
                         root_dir=project_path(project_name),
-                        query=improve_query(project_name, query),
+                        query=query,
                         community_level=int(community_level),
                         streaming=False,
                         config_filepath=None,

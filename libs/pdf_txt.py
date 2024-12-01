@@ -230,8 +230,7 @@ def save_pdf_pages_as_images(pdf_path:str, project_name:str, pdf_vision_option: 
         for future in concurrent.futures.as_completed(future_to_page):
             page_num = future_to_page[future]
             try:
-                prompt, ai_txt = future.result()
-                st.text(prompt)
+                future.result()
                 st.write(f"[{page_num}/{doc.page_count}] `{pdf_file_name}` done")
             except Exception as exc:
                 st.warning(f"[{page_num}/{doc.page_count}] `{pdf_file_name}` generated an exception: {exc}")
