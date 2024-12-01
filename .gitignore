@@ -11,3 +11,4 @@ data/*
 pdf_cache/*
 graphrag_kit.service
 config.yaml
+.idea
