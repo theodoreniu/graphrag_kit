@@ -1,4 +1,4 @@
-from graphrag.query.llm.base import BaseLLM, BaseLLMCallback
+from graphrag.query.llm.base import BaseLLMCallback
 import streamlit as st
 from graphrag.query.structured_search.base import SearchResult
 

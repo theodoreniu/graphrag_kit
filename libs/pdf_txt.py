@@ -55,7 +55,7 @@ class PageTask:
         # use cache if exists
         if os.path.exists(self.ai_txt_path):
             with open(self.ai_txt_path, "r") as f:
-                return f.read()
+                return "", f.read()
 
         self.page_to_image()
         
@@ -85,7 +85,6 @@ class PageTask:
             st.warning(f"[{self.page_num}/{self.doc.page_count}] `{self.pdf_name}` generated an exception: {e}")
         
         return prompt, ai_txt
-
 
     def gpt_vision_txt_azure(self):
         base64_string = image_to_base64(self.img_path)
@@ -117,8 +116,6 @@ class PageTask:
 
         return prompt, ai_txt
 
-
-
     def gpt_vision_txt(self):
         base64_string = image_to_base64(self.img_path)
         settings_file = f"/app/projects/{self.project_name}/prompts/pdf_gpt_vision_prompt.txt"
@@ -149,7 +146,6 @@ class PageTask:
 
         return prompt, ai_txt
 
-
     def gpt_vision_txt_by_txt(self):
         base64_string = image_to_base64(self.img_path)
         settings_file = f"/app/projects/{self.project_name}/prompts/pdf_gpt_vision_prompt_by_text.txt"
@@ -179,7 +175,6 @@ class PageTask:
         ai_txt = completion.choices[0].message.content
 
         return prompt, ai_txt
-
 
     def gpt_vision_txt_by_image(self):
         base64_string = image_to_base64(self.img_path)
@@ -246,7 +241,9 @@ def save_pdf_pages_as_images(pdf_path:str, project_name:str, pdf_vision_option: 
         pt = PageTask(doc, pdf_path, project_name, pdf_vision_option, page_num)
         with open(pdf_ai_txt_path, "a") as f:
             f.write("\n\n")
-            f.write(pt.get_ai_txt())
+            prompt, ai_txt = pt.get_ai_txt()
+            if ai_txt:
+                f.write(ai_txt)
 
 
 def format_bounding_box(bounding_box):
