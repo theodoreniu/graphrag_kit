@@ -31,6 +31,7 @@ def get_query_sources(project_name: str, context_data: any):
         return sources
     
     source_cache = {}
+    screenshot_sas_url_cache = {}
     
     for source in context_data['sources']:
         if source['text'] in source_cache:
@@ -43,14 +44,20 @@ def get_query_sources(project_name: str, context_data: any):
                     content = f.read()
                     if source['text'] in content:
                         pdf_file, screenshot_file, page_number = parse_file_info(txt_file)
-                        sas_url, sas_url_error = get_sas_url(project_name, screenshot_file)
+                        if screenshot_file in screenshot_sas_url_cache:
+                            continue
+                        pdf_sas_url, pdf_sas_url_error = get_sas_url(project_name, pdf_file)
+                        screenshot_sas_url, screenshot_sas_url_error = get_sas_url(project_name, screenshot_file)
                         sources.append({
                             "pdf_file": pdf_file,
                             "screenshot_file": screenshot_file,
                             "page_number": page_number,
-                            "sas_url": sas_url,
-                            "sas_url_error": sas_url_error
+                            "pdf_sas_url": pdf_sas_url,
+                            "pdf_sas_url_error": pdf_sas_url_error,
+                            "screenshot_sas_url": screenshot_sas_url,
+                            "screenshot_sas_url_error": screenshot_sas_url_error
                         })
+                        screenshot_sas_url_cache[screenshot_file] = screenshot_sas_url
             except Exception as e:
                 st.error(f"Error parsing file info: {e}")
                 
