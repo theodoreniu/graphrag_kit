@@ -60,7 +60,7 @@ def page():
     with c2:
         community_level = st.text_input("community_level", value=2)
     with c3:
-        response_type = st.selectbox("Response Type", ["Multiple Paragraphs", "Single Paragraph"])
+        response_type = st.selectbox("Response Type", ["Single Paragraph", "Multiple Paragraphs"])
     
     st.session_state['project_name'] = project_name
     st.session_state['community_level'] = community_level
@@ -191,26 +191,15 @@ def page():
                     
                     query = row['query']
 
-                    cache_key = f"local_search_{project_name}_{index}_{community_level}_{generate_text_fingerprint(query)}"
-                    cache = get_cache_json_from_file(cache_key)
-                    
-                    if cache:
-                        response = cache['response']
-                        context_data = cache['context_data']
-                    else:
-                        (response, context_data) = run_local_search(
-                            root_dir=project_path(project_name),
-                            query=query,
-                            community_level=int(community_level),
-                            response_type="Multiple Paragraphs",
-                            streaming=False,
-                            config_filepath=None,
-                                data_dir=None,
-                        )
-                        set_cache_json_to_file(cache_key, {
-                            'response': response,
-                            'context_data': context_data
-                        })
+                    (response, context_data) = run_local_search(
+                        root_dir=project_path(project_name),
+                        query=query,
+                        community_level=int(community_level),
+                        response_type=response_type,
+                        streaming=False,
+                        config_filepath=None,
+                        data_dir=None,
+                    )
                     
                     st.info(f"Query: {row['query']}")
                     
