@@ -1,5 +1,4 @@
 import time
-import numpy as np
 import requests
 
 import pandas as pd
@@ -7,8 +6,6 @@ import streamlit as st
 import os
 import re
 import zipfile
-import os
-import streamlit as st
 from libs import config
 from libs.common import run_command
 from libs.config import generate_data_vision, generate_data_vision_txt, generate_data_vision_image, generate_data_vision_di, generate_data_vision_azure

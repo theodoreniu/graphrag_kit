@@ -12,8 +12,6 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 from libs.common import get_original_dir, list_files_and_sizes, run_command
 from pathlib import Path
 from  libs.common import debug
-import libs.config as config
-import pandas as pd
 
 tracemalloc.start()
 
