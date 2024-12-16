@@ -7,7 +7,7 @@ import io
 from libs.find_sources import get_query_sources
 from libs.render_context import get_real_response, render_context_data_drift, render_context_data_global, render_context_data_local, render_response
 from libs.save_settings import set_settings
-from libs.common import generate_text_fingerprint, get_cache_json_from_file, get_project_names, project_path, restart_component, set_cache_json_to_file
+from libs.common import get_project_names, project_path, restart_component
 import pandas as pd
 import libs.config as config
 from graphrag.cli.query import run_local_search, run_global_search, run_drift_search
@@ -15,6 +15,7 @@ from openai import AzureOpenAI
 import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
+from libs.render_excel import render_excel_file
 
 load_dotenv()
 
@@ -206,12 +207,12 @@ def page():
                     if 'answer' in row:
                         st.warning(f"Answer: {row['answer']}")
 
-                    modified_df.at[index, f"{project_name}_response"] = response
+                    modified_df.at[index, "GraphRAG"] = response
                     result = get_real_response(response)
                     st.success(f"GraphRAG (chars {len(result)}): {response}")
-                    modified_df.at[index, f"{project_name}_response_count"] = len(result)
-                    modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
-                    modified_df.at[index, f"{project_name}_response_type"] = response_type
+                    # modified_df.at[index, f"{project_name}_response_count"] = len(result)
+                    # modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
+                    # modified_df.at[index, f"{project_name}_response_type"] = response_type
                     if enable_print_context:
                         render_context_data_local(context_data)
             
@@ -222,6 +223,8 @@ def page():
             for sheet_name, df in modified_sheets.items():
                 df.to_excel(writer, sheet_name=sheet_name, index=False)   
         
+        output = render_excel_file(output)
+
         st.markdown("-------------------------------------------")
         st.download_button(
             label="Download Test Results",
