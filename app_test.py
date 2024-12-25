@@ -160,6 +160,17 @@ def page():
     st.markdown("Currently, only `Local Search` is supported.")
     st.markdown("Query `cache` enabled, the same query will not be executed multiple times.")
     
+    # download test set excel file
+    st.markdown("-----------------")
+    st.download_button(
+        label="Download Test File",
+        data=open('./template/test_set.xlsx', 'rb').read(),
+        file_name='test_set.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        icon="💾",
+    )
+    st.markdown("-----------------")
+    
     enable_print_context = st.checkbox("Print every item context", value=False)
     
     uploaded_file = st.file_uploader(
@@ -171,65 +182,12 @@ def page():
     )
     
     if uploaded_file is not None:
-        excel_data = pd.ExcelFile(uploaded_file)
-        modified_sheets = {}
-
-        for sheet_name in excel_data.sheet_names:
-            st.write(f"### Sheet: {sheet_name}")
-            
-            sheet_df = excel_data.parse(sheet_name)
-            row_count = len(sheet_df)
-            
-            modified_df = sheet_df.copy()
-            
-            for index, row in sheet_df.iterrows():
-                if 'query' not in row:
-                    raise Exception("query must be in every row")
-
-                index_name = f"{index+1}/{row_count}"
-                st.markdown(f"## {index_name}")
-                with st.spinner(f'Generating ...'):
-                    
-                    query = row['query']
-
-                    (response, context_data) = run_local_search(
-                        root_dir=project_path(project_name),
-                        query=query,
-                        community_level=int(community_level),
-                        response_type=response_type,
-                        streaming=False,
-                        config_filepath=None,
-                        data_dir=None,
-                    )
-                    
-                    st.info(f"Query: {row['query']}")
-                    
-                    if 'answer' in row:
-                        st.warning(f"Answer: {row['answer']}")
-
-                    modified_df.at[index, "GraphRAG"] = response
-                    result = get_real_response(response)
-                    st.success(f"GraphRAG (chars {len(result)}): {response}")
-                    # modified_df.at[index, f"{project_name}_response_count"] = len(result)
-                    # modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
-                    # modified_df.at[index, f"{project_name}_response_type"] = response_type
-                    if enable_print_context:
-                        render_context_data_local(context_data)
-            
-            modified_sheets[sheet_name] = modified_df
-        
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            for sheet_name, df in modified_sheets.items():
-                df.to_excel(writer, sheet_name=sheet_name, index=False)   
-        
-        output = render_excel_file(output)
-
+        output = test_file(uploaded_file, project_name, community_level, response_type, enable_print_context)
         st.markdown("-------------------------------------------")
         st.download_button(
             label="Download Test Results",
             data=output.getvalue(),
-            file_name=uploaded_file.name,
+            file_name=uploaded_file.name.replace(".xlsx", "_result.xlsx"),
             icon="💾",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
@@ -246,6 +204,64 @@ def page():
     #                 callbacks=[LLMCallback()],
     #             )
     #             st.success(result.response)
+
+
+@st.cache_data
+def test_file(uploaded_file, project_name, community_level, response_type, enable_print_context):
+    excel_data = pd.ExcelFile(uploaded_file)
+    modified_sheets = {}
+
+    for sheet_name in excel_data.sheet_names:
+        st.write(f"### Sheet: {sheet_name}")
+        
+        sheet_df = excel_data.parse(sheet_name)
+        row_count = len(sheet_df)
+        
+        modified_df = sheet_df.copy()
+        
+        for index, row in sheet_df.iterrows():
+            if 'query' not in row:
+                raise Exception("query must be in every row")
+
+            index_name = f"{index+1}/{row_count}"
+            st.markdown(f"## {index_name}")
+            with st.spinner(f'Generating ...'):
+                
+                query = row['query']
+
+                (response, context_data) = run_local_search(
+                    root_dir=project_path(project_name),
+                    query=query,
+                    community_level=int(community_level),
+                    response_type=response_type,
+                    streaming=False,
+                    config_filepath=None,
+                    data_dir=None,
+                )
+                
+                st.info(f"Query: {row['query']}")
+                
+                if 'answer' in row:
+                    st.warning(f"Answer: {row['answer']}")
+
+                modified_df.at[index, "GraphRAG"] = response
+                result = get_real_response(response)
+                st.success(f"GraphRAG (chars {len(result)}): {response}")
+                # modified_df.at[index, f"{project_name}_response_count"] = len(result)
+                # modified_df.at[index, f"{project_name}_context_data"] = json.dumps(context_data, ensure_ascii=False, indent=4)
+                # modified_df.at[index, f"{project_name}_response_type"] = response_type
+                if enable_print_context:
+                    render_context_data_local(context_data)
+        
+        modified_sheets[sheet_name] = modified_df
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        for sheet_name, df in modified_sheets.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)   
+    
+    output = render_excel_file(output)
+    return output
 
 
 if __name__ == "__main__":
